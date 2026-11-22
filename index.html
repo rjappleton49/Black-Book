@@ -1,0 +1,2093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1E4620" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="WGC Black Book Boys" />
+  <link id="pwaManifestLink" rel="manifest" />
+  <link id="appleTouchIconLink" rel="apple-touch-icon" />
+  <title>WGC Black Book Boys — Mobile Handicap &amp; Score Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #F3F6F4;
+      color: #142416;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: contain;
+    }
+    .clubhouse-gradient {
+      background: linear-gradient(135deg, #1E4620 0%, #2E6B31 100%);
+    }
+    .gold-banner {
+      background: linear-gradient(135deg, #FFF7DC 0%, #FDEBB3 100%);
+      border: 2px solid #D4A017;
+    }
+    .tie-banner {
+      background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+      border: 2px solid #DC2626;
+    }
+    .keypad-btn {
+      transition: transform 0.06s ease, background-color 0.1s ease;
+      user-select: none;
+    }
+    .keypad-btn:active {
+      transform: scale(0.95);
+    }
+    /* Hide scrollbars on horizontal pill strip */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- TOP CLUBHOUSE HEADER -->
+  <header class="clubhouse-gradient text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-lg mx-auto px-4 pt-3 pb-2.5">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 min-w-0">
+          <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center shrink-0 text-lg font-black text-amber-300 border border-white/20">
+            ⛳
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5">
+              <h1 class="text-sm sm:text-base font-extrabold tracking-tight leading-tight truncate">Golf Society</h1>
+              <button id="syncStatusPill" onclick="openSyncModal()" title="Multi-Device Sync Settings"
+                class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-white/15 hover:bg-white/25 border border-white/20 text-emerald-100 shrink-0 transition">
+                <span id="syncStatusDot" class="w-1.5 h-1.5 rounded-full bg-amber-300"></span>
+                <span id="syncStatusText">Offline</span>
+              </button>
+            </div>
+            <p class="text-[11px] text-emerald-100/90 font-medium truncate" id="headerSubtext">20 Players • Wed &amp; Sat League</p>
+          </div>
+        </div>
+
+        <!-- Session Selector Pill -->
+        <div class="flex items-center gap-1 shrink-0">
+          <select id="sessionSelect" aria-label="Select Session"
+            class="bg-white/15 text-white text-xs font-bold rounded-xl px-2 py-2 border border-white/25 focus:outline-none focus:ring-2 focus:ring-amber-300">
+          </select>
+          <button onclick="openCalendarModal('edit')" title="Change Session Date"
+            class="bg-white/15 hover:bg-white/25 active:scale-95 text-white font-bold text-xs px-2 py-2 rounded-xl border border-white/25 transition" aria-label="Edit Session Date">
+            📅
+          </button>
+          <button onclick="openCalendarModal('new')" title="Schedule New Session"
+            class="bg-amber-400 hover:bg-amber-300 active:scale-95 text-emerald-950 font-extrabold text-xs px-2 py-2 rounded-xl shadow-sm transition">
+            + New
+          </button>
+          <button id="headerDeleteSessionBtn" onclick="deleteSession(getActiveSession().id)" title="Cancel / Delete Rained-Off Session"
+            class="bg-rose-500/85 hover:bg-rose-500 active:scale-95 text-white font-extrabold text-xs px-2 py-2 rounded-xl shadow-sm transition" aria-label="Delete Session">
+            🗑️
+          </button>
+        </div>
+      </div>
+
+      <!-- Primary Navigation Tabs -->
+      <nav class="grid grid-cols-3 gap-1.5 mt-2.5 bg-black/20 p-1 rounded-xl">
+        <button id="tabBtn-entry" onclick="switchTab('entry')"
+          class="py-2 px-2 rounded-lg text-xs font-extrabold transition text-center bg-white text-[#1E4620] shadow-sm">
+          Enter Scores
+        </button>
+        <button id="tabBtn-results" onclick="switchTab('results')"
+          class="py-2 px-2 rounded-lg text-xs font-bold transition text-center text-emerald-100 hover:text-white">
+          Today's Results
+        </button>
+        <button id="tabBtn-season" onclick="switchTab('season')"
+          class="py-2 px-2 rounded-lg text-xs font-bold transition text-center text-emerald-100 hover:text-white">
+          Season &amp; App
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-1 max-w-lg w-full mx-auto px-3.5 py-3 pb-10">
+
+    <!-- LIVE WINNER DECLARATION BANNER (Always visible across tabs) -->
+    <section id="declarationBanner" class="rounded-2xl p-3.5 mb-3 shadow-sm transition-all">
+      <!-- Populated dynamically by JS -->
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- VIEW 1: MOBILE-FIRST ZERO-KEYBOARD SCORE ENTRY WIZARD      -->
+    <!-- ========================================================= -->
+    <div id="view-entry" class="space-y-3">
+
+      <!-- Quick Player Jump Strip & Progress -->
+      <div class="bg-white rounded-2xl p-3 shadow-sm border border-emerald-900/10">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-900/70" id="entryProgressLabel">
+            Player 1 of 20 • 0 Entered
+          </span>
+          <button onclick="openRosterJumpModal()"
+            class="text-xs font-bold text-[#1E4620] bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200">
+            All 20 Players ▾
+          </button>
+        </div>
+        <!-- Horizontal scrollable player pills -->
+        <div id="playerPillStrip" class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Active Player Entry Card -->
+      <div class="bg-white rounded-2xl p-4 shadow-md border border-emerald-900/10 space-y-3.5">
+        <!-- Player Header & Starting Handicap -->
+        <div class="flex items-start justify-between gap-2 border-b border-slate-100 pb-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span id="cardPlayerBadge" class="inline-flex items-center justify-center px-2 py-0.5 rounded-md text-[11px] font-extrabold bg-emerald-100 text-[#1E4620]">
+                #1
+              </span>
+              <span id="cardStatusBadge" class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-600">
+                Not Entered
+              </span>
+            </div>
+            <h2 id="cardPlayerName" class="text-xl font-black text-slate-900 mt-1 truncate">Player 1</h2>
+          </div>
+
+          <div class="flex gap-2 shrink-0 text-right">
+            <div class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
+              <div class="text-[10px] font-bold uppercase text-slate-500">Start Hcp</div>
+              <div id="cardStartHcp" class="text-lg font-black text-slate-800 leading-tight">12</div>
+            </div>
+            <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-1.5">
+              <div class="text-[10px] font-bold uppercase text-emerald-700">New Hcp</div>
+              <div id="cardNewHcp" class="text-lg font-black text-[#1E4620] leading-tight">12</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 1: Stableford Score Display + Custom Touch Keypad -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-xs font-extrabold uppercase tracking-wider text-slate-600">
+              1. Stableford Score
+            </label>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px] font-semibold text-slate-500">Combined:</span>
+              <span id="cardCombinedScore" class="text-sm font-black px-2 py-0.5 rounded-lg bg-amber-100 text-amber-900">
+                —
+              </span>
+            </div>
+          </div>
+
+          <!-- Score Readout Box + Quick +/- Steppers -->
+          <div class="grid grid-cols-4 gap-2 mb-2">
+            <button type="button" onclick="adjustScore(-1)"
+              class="keypad-btn bg-slate-100 hover:bg-slate-200 text-slate-800 font-black text-xl rounded-xl py-3 border border-slate-200">
+              −1
+            </button>
+            <div class="col-span-2 bg-emerald-50/70 border-2 border-[#1E4620] rounded-xl flex flex-col items-center justify-center py-1.5">
+              <span id="scoreDisplay" class="text-3xl font-black text-[#1E4620] tracking-tight leading-none">—</span>
+              <span class="text-[10px] font-bold text-emerald-800/70 mt-0.5">Tap digits below</span>
+            </div>
+            <button type="button" onclick="adjustScore(1)"
+              class="keypad-btn bg-slate-100 hover:bg-slate-200 text-slate-800 font-black text-xl rounded-xl py-3 border border-slate-200">
+              +1
+            </button>
+          </div>
+
+          <!-- Common Golf Stableford Quick-Tap Row -->
+          <div class="grid grid-cols-8 gap-1 mb-2">
+            <button type="button" onclick="setExactScore(28)" class="keypad-btn py-2 rounded-lg bg-slate-100 text-slate-700 font-bold text-[11px] border border-slate-200">28</button>
+            <button type="button" onclick="setExactScore(30)" class="keypad-btn py-2 rounded-lg bg-slate-100 text-slate-700 font-bold text-[11px] border border-slate-200">30</button>
+            <button type="button" onclick="setExactScore(32)" class="keypad-btn py-2 rounded-lg bg-slate-100 text-slate-700 font-bold text-[11px] border border-slate-200">32</button>
+            <button type="button" onclick="setExactScore(34)" class="keypad-btn py-2 rounded-lg bg-slate-100 text-slate-700 font-bold text-[11px] border border-slate-200">34</button>
+            <button type="button" onclick="setExactScore(36)" class="keypad-btn py-2 rounded-lg bg-emerald-100 text-emerald-900 font-extrabold text-[11px] border border-emerald-300">36</button>
+            <button type="button" onclick="setExactScore(38)" class="keypad-btn py-2 rounded-lg bg-slate-100 text-slate-700 font-bold text-[11px] border border-slate-200">38</button>
+            <button type="button" onclick="setExactScore(40)" class="keypad-btn py-2 rounded-lg bg-slate-100 text-slate-700 font-bold text-[11px] border border-slate-200">40</button>
+            <button type="button" onclick="setExactScore(42)" class="keypad-btn py-2 rounded-lg bg-slate-100 text-slate-700 font-bold text-[11px] border border-slate-200">42</button>
+          </div>
+
+          <!-- Custom On-Screen Numeric Keypad (Prevents OS Keyboard Overlap!) -->
+          <div class="grid grid-cols-3 gap-1.5">
+            <button type="button" onclick="pressDigit('1')" class="keypad-btn bg-slate-50 hover:bg-slate-100 active:bg-emerald-100 border border-slate-200 rounded-xl py-2.5 text-lg font-extrabold text-slate-900">1</button>
+            <button type="button" onclick="pressDigit('2')" class="keypad-btn bg-slate-50 hover:bg-slate-100 active:bg-emerald-100 border border-slate-200 rounded-xl py-2.5 text-lg font-extrabold text-slate-900">2</button>
+            <button type="button" onclick="pressDigit('3')" class="keypad-btn bg-slate-50 hover:bg-slate-100 active:bg-emerald-100 border border-slate-200 rounded-xl py-2.5 text-lg font-extrabold text-slate-900">3</button>
+            <button type="button" onclick="pressDigit('4')" class="keypad-btn bg-slate-50 hover:bg-slate-100 active:bg-emerald-100 border border-slate-200 rounded-xl py-2.5 text-lg font-extrabold text-slate-900">4</button>
+            <button type="button" onclick="pressDigit('5')" class="keypad-btn bg-slate-50 hover:bg-slate-100 active:bg-emerald-100 border border-slate-200 rounded-xl py-2.5 text-lg font-extrabold text-slate-900">5</button>
+            <button type="button" onclick="pressDigit('6')" class="keypad-btn bg-slate-50 hover:bg-slate-100 active:bg-emerald-100 border border-slate-200 rounded-xl py-2.5 text-lg font-extrabold text-slate-900">6</button>
+            <button type="button" onclick="pressDigit('7')" class="keypad-btn bg-slate-50 hover:bg-slate-100 active:bg-emerald-100 border border-slate-200 rounded-xl py-2.5 text-lg font-extrabold text-slate-900">7</button>
+            <button type="button" onclick="pressDigit('8')" class="keypad-btn bg-slate-50 hover:bg-slate-100 active:bg-emerald-100 border border-slate-200 rounded-xl py-2.5 text-lg font-extrabold text-slate-900">8</button>
+            <button type="button" onclick="pressDigit('9')" class="keypad-btn bg-slate-50 hover:bg-slate-100 active:bg-emerald-100 border border-slate-200 rounded-xl py-2.5 text-lg font-extrabold text-slate-900">9</button>
+            <button type="button" onclick="clearCurrentScore()" class="keypad-btn bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl py-2.5 text-xs font-extrabold text-rose-700 uppercase">Clear</button>
+            <button type="button" onclick="pressDigit('0')" class="keypad-btn bg-slate-50 hover:bg-slate-100 active:bg-emerald-100 border border-slate-200 rounded-xl py-2.5 text-lg font-extrabold text-slate-900">0</button>
+            <button type="button" onclick="backspaceDigit()" class="keypad-btn bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl py-2.5 text-base font-extrabold text-slate-700">⌫</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Scored on Par-5 18th Hole? -->
+        <div class="pt-1">
+          <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-1.5">
+            2. Scored on Par-5 18th Hole?
+          </label>
+          <div class="grid grid-cols-2 gap-2.5">
+            <button type="button" id="btn18Yes" onclick="setEighteenth('Y')"
+              class="keypad-btn py-3.5 px-3 rounded-2xl border-2 font-black text-base flex flex-col items-center justify-center transition">
+              <span>YES (Y)</span>
+              <span class="text-[11px] font-semibold opacity-85">+1 Score &amp; +1 Hcp</span>
+            </button>
+            <button type="button" id="btn18No" onclick="setEighteenth('N')"
+              class="keypad-btn py-3.5 px-3 rounded-2xl border-2 font-black text-base flex flex-col items-center justify-center transition">
+              <span>NO (N)</span>
+              <span class="text-[11px] font-semibold opacity-85">No 18th Bonus</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Navigation & Skip Controls -->
+        <div class="pt-2 border-t border-slate-100 grid grid-cols-12 gap-2">
+          <button type="button" onclick="prevPlayer()"
+            class="col-span-3 keypad-btn py-3.5 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs border border-slate-200">
+            ← Prev
+          </button>
+          <button type="button" onclick="skipPlayerDNP()"
+            class="col-span-4 keypad-btn py-3.5 px-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 font-extrabold text-xs border border-amber-200">
+            Skip (DNP)
+          </button>
+          <button type="button" onclick="nextPlayer()"
+            class="col-span-5 keypad-btn py-3.5 px-3 rounded-xl clubhouse-gradient text-white font-black text-sm shadow-sm">
+            Next Player →
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Action Footer -->
+      <div class="flex items-center justify-between gap-2 px-1">
+        <button onclick="switchTab('results')"
+          class="text-xs font-extrabold text-[#1E4620] underline underline-offset-2">
+          View Full Session Table →
+        </button>
+        <button onclick="confirmClearSessionScores()"
+          class="text-xs font-semibold text-rose-600 hover:text-rose-700">
+          Reset Today's Scores
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- VIEW 2: TODAY'S SESSION RESULTS & HANDICAP BREAKDOWN      -->
+    <!-- ========================================================= -->
+    <div id="view-results" class="hidden space-y-3">
+
+      <!-- Session Meta & KPI Strip -->
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-emerald-900/10">
+        <div class="flex items-center justify-between gap-2 mb-3">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Session Date (Tap to Reschedule)</span>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <button onclick="openCalendarModal('edit')" id="resultsSessionDateBtn"
+                class="text-xs font-extrabold text-slate-900 bg-slate-50 hover:bg-emerald-50 border border-slate-200 rounded-xl px-2.5 py-2 flex items-center gap-1.5 transition">
+                <span>📅</span>
+                <span id="resultsSessionDateText">Mon, 23 Nov 2026</span>
+              </button>
+              <button id="resultsDeleteSessionBtn" onclick="deleteSession(getActiveSession().id)"
+                class="text-xs font-extrabold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl px-2.5 py-2 transition"
+                title="Delete rained-off session">
+                🗑️ Cancel Day
+              </button>
+            </div>
+          </div>
+          <button onclick="openCalendarModal('new')"
+            class="clubhouse-gradient text-white text-xs font-extrabold px-3 py-2.5 rounded-xl shadow-sm active:scale-95 transition shrink-0">
+            + New Session
+          </button>
+        </div>
+
+        <div class="grid grid-cols-4 gap-2 text-center">
+          <div class="bg-slate-50 rounded-xl p-2 border border-slate-100">
+            <div class="text-[10px] font-bold text-slate-500 uppercase">Played</div>
+            <div id="kpiPlayed" class="text-base font-black text-slate-900">0/20</div>
+          </div>
+          <div class="bg-emerald-50 rounded-xl p-2 border border-emerald-100">
+            <div class="text-[10px] font-bold text-emerald-700 uppercase">Pot (£2)</div>
+            <div id="kpiPot" class="text-base font-black text-[#1E4620]">£0</div>
+          </div>
+          <div class="bg-amber-50 rounded-xl p-2 border border-amber-100">
+            <div class="text-[10px] font-bold text-amber-800 uppercase">Top / 2nd</div>
+            <div id="kpiTopSecond" class="text-sm font-black text-amber-950 mt-0.5">— / —</div>
+          </div>
+          <div class="bg-rose-50 rounded-xl p-2 border border-rose-100">
+            <div class="text-[10px] font-bold text-rose-700 uppercase">Win Cut</div>
+            <div id="kpiCut" class="text-base font-black text-rose-800">0</div>
+          </div>
+        </div>
+
+        <!-- 1-Tap WhatsApp / Clipboard Share Bar -->
+        <div class="grid grid-cols-2 gap-2 mt-3 pt-2.5 border-t border-slate-100">
+          <button onclick="shareResultsWhatsApp()"
+            class="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-xs transition">
+            <span>💬</span>
+            <span>Share to WhatsApp</span>
+          </button>
+          <button onclick="copyResultsSummary()"
+            class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 font-extrabold text-xs flex items-center justify-center gap-1.5 border border-slate-200 transition">
+            <span>📋</span>
+            <span>Copy Summary</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile-Optimized Session Scorecard List -->
+      <div class="bg-white rounded-2xl shadow-sm border border-emerald-900/10 overflow-hidden">
+        <div class="px-3.5 py-2.5 bg-emerald-950 text-white flex items-center justify-between">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Session Breakdown (Tap Row to Edit)</span>
+          <span class="text-[11px] text-emerald-200 font-semibold">Start → New Hcp</span>
+        </div>
+        <div id="resultsListContainer" class="divide-y divide-slate-100">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Rules Reference Card -->
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-emerald-900/10 text-xs text-slate-600 space-y-1">
+        <div class="font-extrabold text-slate-900">League Rules Applied Automatically:</div>
+        <p>• <strong>Combined Score:</strong> Stableford + 1 if scored on par-5 18th (Y).</p>
+        <p>• <strong>Winner &amp; Tie Rule:</strong> Outright highest Combined Score wins (£2 × players today). If tied for 1st, no winner and all money is returned (no rollover).</p>
+        <p>• <strong>Winner's Cut:</strong> 1 (win) + points over 36 + margin over 2nd place.</p>
+        <p>• <strong>18th Bonus:</strong> +1 added to next session's handicap for every Y on 18th.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- VIEW 3: SEASON STANDINGS, ROSTER EDITOR & CSV EXPORT      -->
+    <!-- ========================================================= -->
+    <div id="view-season" class="hidden space-y-3">
+
+      <!-- PWA Home Screen Install & Multi-Device Sync Card -->
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-emerald-900/10 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-black text-slate-900">Phone App &amp; Live Group Sync</h2>
+            <p class="text-xs text-slate-500">Install on your Home Screen &amp; share a live Group Code.</p>
+          </div>
+          <span id="seasonSyncBadge" class="text-[10px] font-extrabold px-2 py-1 rounded-lg bg-slate-100 text-slate-600">
+            Local Mode
+          </span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="triggerPwaInstall()"
+            class="py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 active:scale-95 text-emerald-950 font-black text-xs shadow-xs transition flex items-center justify-center gap-1.5">
+            <span>📲</span>
+            <span>Install Phone App</span>
+          </button>
+          <button onclick="openSyncModal()"
+            class="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 active:scale-95 text-[#1E4620] font-extrabold text-xs border border-emerald-200 transition flex items-center justify-center gap-1.5">
+            <span>☁️</span>
+            <span>Multi-Device Sync</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Roster & Export Actions -->
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-emerald-900/10 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-black text-slate-900">League Roster &amp; Backups</h2>
+            <p class="text-xs text-slate-500">Edit the 20 golfers or export/restore full backups.</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="openRosterModal()"
+            class="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#1E4620] font-extrabold text-xs border border-emerald-200 transition">
+            ✏️ Edit 20 Names &amp; Hcps
+          </button>
+          <button onclick="exportToCSV()"
+            class="py-2.5 px-3 rounded-xl clubhouse-gradient text-white font-extrabold text-xs shadow-sm transition">
+            📥 Export CSV / Excel
+          </button>
+          <button onclick="exportJsonBackup()"
+            class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs border border-slate-200 transition">
+            💾 Save Backup File
+          </button>
+          <label class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs border border-slate-200 transition text-center cursor-pointer">
+            📂 Restore Backup
+            <input type="file" accept=".json,application/json" onchange="importJsonBackup(event)" class="hidden" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Season Leaderboard -->
+      <div class="bg-white rounded-2xl shadow-sm border border-emerald-900/10 overflow-hidden">
+        <div class="px-3.5 py-2.5 bg-emerald-950 text-white flex items-center justify-between">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Season Standings (<span id="seasonCountLabel">1</span> Sessions)</span>
+          <span class="text-[11px] text-amber-300 font-bold">Wins • £ • Current Hcp</span>
+        </div>
+        <div id="seasonStandingsList" class="divide-y divide-slate-100">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Manage Sessions -->
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-emerald-900/10 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-slate-700">Recorded Sessions</span>
+          <button onclick="openCalendarModal('new')" class="text-xs font-extrabold text-[#1E4620] underline">
+            + Schedule Session
+          </button>
+        </div>
+        <div id="sessionHistoryList" class="space-y-1.5">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 1: ALL 20 PLAYERS QUICK-JUMP DRAWER                 -->
+  <!-- ========================================================= -->
+  <div id="rosterJumpModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-3">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden max-h-[82vh] flex flex-col">
+      <div class="px-4 py-3 clubhouse-gradient text-white flex items-center justify-between">
+        <span class="font-extrabold text-sm">Select Player to Enter / Edit Score</span>
+        <button onclick="closeModal('rosterJumpModal')" class="text-white/80 hover:text-white font-black text-lg px-2">✕</button>
+      </div>
+      <div id="rosterJumpGrid" class="p-3 overflow-y-auto grid grid-cols-1 gap-1.5">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 2: POP-UP CALENDAR DATE PICKER (NEW & EDIT SESSION) -->
+  <!-- ========================================================= -->
+  <div id="calendarModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-3">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+      <div class="px-4 py-3 clubhouse-gradient text-white flex items-center justify-between">
+        <div>
+          <div id="calendarModalTitle" class="font-extrabold text-sm">Schedule Next Session</div>
+          <div id="calendarModalSubtitle" class="text-[11px] text-emerald-100">Tap any date to skip rained-off or no-play days</div>
+        </div>
+        <button onclick="closeModal('calendarModal')" class="text-white/80 hover:text-white font-black text-lg px-2">✕</button>
+      </div>
+
+      <div class="p-4 space-y-3">
+        <!-- Month Navigation Header -->
+        <div class="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5">
+          <button type="button" onclick="changeCalendarMonth(-1)"
+            class="w-9 h-9 rounded-lg bg-white border border-slate-200 hover:bg-emerald-50 font-black text-slate-700 flex items-center justify-center">
+            ‹
+          </button>
+          <div id="calendarMonthLabel" class="text-sm font-black text-slate-900">November 2026</div>
+          <button type="button" onclick="changeCalendarMonth(1)"
+            class="w-9 h-9 rounded-lg bg-white border border-slate-200 hover:bg-emerald-50 font-black text-slate-700 flex items-center justify-center">
+            ›
+          </button>
+        </div>
+
+        <!-- Day-of-Week Labels -->
+        <div class="grid grid-cols-7 gap-1 text-center text-[11px] font-extrabold uppercase text-slate-400">
+          <div>Mon</div>
+          <div>Tue</div>
+          <div class="text-emerald-700">Wed</div>
+          <div>Thu</div>
+          <div>Fri</div>
+          <div class="text-emerald-700">Sat</div>
+          <div>Sun</div>
+        </div>
+
+        <!-- Interactive Monthly Calendar Grid -->
+        <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Legend & Quick Skip Helper -->
+        <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 pt-1 border-t border-slate-100">
+          <div class="flex items-center gap-2.5">
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#1E4620] inline-block"></span> Selected</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-200 border border-emerald-400 inline-block"></span> Wed/Sat</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span> Session</span>
+          </div>
+          <button type="button" onclick="jumpCalendarToNextPlayingDay()"
+            class="font-extrabold text-[#1E4620] hover:underline">
+            Skip to Next Wed/Sat →
+          </button>
+        </div>
+
+        <!-- Selected Date Summary Box -->
+        <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-2.5 flex items-center justify-between">
+          <div>
+            <div class="text-[10px] font-bold uppercase text-emerald-800">Selected Play Date</div>
+            <div id="calendarSelectedDisplay" class="text-sm font-black text-slate-900">Sat, 28 Nov 2026</div>
+          </div>
+          <span id="calendarCollisionWarning" class="hidden text-[10px] font-extrabold bg-amber-200 text-amber-950 px-2 py-1 rounded-lg">
+            Date already exists
+          </span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-2 pt-1">
+          <button type="button" onclick="closeModal('calendarModal')"
+            class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs">
+            Cancel
+          </button>
+          <button type="button" id="calendarConfirmBtn" onclick="confirmCalendarSelection()"
+            class="flex-1 py-3 rounded-xl clubhouse-gradient text-white font-extrabold text-xs shadow-sm">
+            Schedule Session →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 3: EDIT 20 PLAYERS ROSTER & INITIAL HANDICAPS       -->
+  <!-- ========================================================= -->
+  <div id="rosterModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-3">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden max-h-[88vh] flex flex-col">
+      <div class="px-4 py-3 clubhouse-gradient text-white flex items-center justify-between">
+        <div>
+          <div class="font-extrabold text-sm">Edit 20 Golfers &amp; Starting Handicaps</div>
+          <div class="text-[11px] text-emerald-100">Updates names across all sessions &amp; Session 1 start Hcps</div>
+        </div>
+        <button onclick="closeModal('rosterModal')" class="text-white/80 hover:text-white font-black text-lg px-2">✕</button>
+      </div>
+      <div id="rosterEditFormList" class="p-3 overflow-y-auto space-y-2 flex-1">
+        <!-- Populated dynamically -->
+      </div>
+      <div class="p-3 border-t border-slate-100 bg-slate-50 flex gap-2">
+        <button onclick="closeModal('rosterModal')"
+          class="flex-1 py-3 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-xs">
+          Cancel
+        </button>
+        <button onclick="saveRosterChanges()"
+          class="flex-1 py-3 rounded-xl clubhouse-gradient text-white font-extrabold text-xs shadow-sm">
+          Save Roster &amp; Recalculate
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM NON-BLOCKING CONFIRM / TOAST MESSAGE -->
+  <div id="toastBanner" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 hidden bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-lg text-center max-w-[90vw]">
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 4: PWA HOME SCREEN INSTALL GUIDE (iOS & ANDROID)    -->
+  <!-- ========================================================= -->
+  <div id="installGuideModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-3">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+      <div class="px-4 py-3 clubhouse-gradient text-white flex items-center justify-between">
+        <div>
+          <div class="font-extrabold text-sm">Install Golf Society App on Phone</div>
+          <div class="text-[11px] text-emerald-100">Works full-screen &amp; offline in the clubhouse</div>
+        </div>
+        <button onclick="closeModal('installGuideModal')" class="text-white/80 hover:text-white font-black text-lg px-2">✕</button>
+      </div>
+      <div class="p-4 space-y-3 text-xs text-slate-700">
+        <div id="nativeInstallRow" class="hidden bg-amber-50 border border-amber-300 rounded-xl p-3 flex items-center justify-between gap-2">
+          <div>
+            <div class="font-black text-amber-950">1-Tap Install Ready!</div>
+            <div class="text-[11px] text-amber-900">Add directly to your phone's Home Screen.</div>
+          </div>
+          <button onclick="promptNativeInstall()" class="px-3 py-2 rounded-xl bg-amber-400 text-emerald-950 font-black text-xs shrink-0">
+            Install Now
+          </button>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5">
+          <div class="font-black text-slate-900 flex items-center gap-1.5">
+            <span>🍎</span> <span>iPhone / iPad (Safari):</span>
+          </div>
+          <p>1. Open this page in <strong>Safari</strong>.</p>
+          <p>2. Tap the <strong>Share</strong> icon <span class="px-1.5 py-0.5 bg-white border rounded font-bold">⎋</span> at the bottom of the screen.</p>
+          <p>3. Scroll down and tap <strong>"Add to Home Screen"</strong> → <strong>Add</strong>.</p>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5">
+          <div class="font-black text-slate-900 flex items-center gap-1.5">
+            <span>🤖</span> <span>Android (Chrome):</span>
+          </div>
+          <p>1. Tap the <strong>⋮ Menu</strong> button in the top-right corner of Chrome.</p>
+          <p>2. Tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong>.</p>
+        </div>
+
+        <button onclick="closeModal('installGuideModal')" class="w-full py-3 rounded-xl clubhouse-gradient text-white font-extrabold text-xs">
+          Got It
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 5: MULTI-DEVICE CLOUD SYNC (SHARED GROUP CODE)      -->
+  <!-- ========================================================= -->
+  <div id="syncModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-3">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+      <div class="px-4 py-3 clubhouse-gradient text-white flex items-center justify-between">
+        <div>
+          <div class="font-extrabold text-sm">Multi-Device Live Sync</div>
+          <div class="text-[11px] text-emerald-100">Share a Group Code so committee phones stay in sync</div>
+        </div>
+        <button onclick="closeModal('syncModal')" class="text-white/80 hover:text-white font-black text-lg px-2">✕</button>
+      </div>
+      <div class="p-4 space-y-3">
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-950 space-y-1">
+          <div class="font-black">How Shared Group Sync Works:</div>
+          <p>Enter any Group Code (for example <strong class="font-mono bg-white px-1.5 py-0.5 rounded border">WHITBY20</strong>) on your phone and another member's phone. Any score, session, or handicap change updates both phones automatically.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-1">
+            Society Group Code (Letters &amp; Numbers)
+          </label>
+          <div class="flex gap-2">
+            <input type="text" id="groupCodeInput" maxlength="24" placeholder="e.g. WHITBY20"
+              class="flex-1 uppercase font-mono font-black text-base bg-slate-50 border-2 border-slate-300 focus:border-[#1E4620] rounded-xl px-3 py-2.5 text-slate-900 focus:outline-none" />
+            <button type="button" onclick="generateRandomGroupCode()"
+              class="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs border border-slate-200">
+              Random
+            </button>
+          </div>
+        </div>
+
+        <div id="syncConnectionBanner" class="text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200 rounded-xl p-2.5">
+          Status: Not connected to a shared group yet.
+        </div>
+
+        <div class="flex gap-2 pt-1">
+          <button type="button" id="disconnectSyncBtn" onclick="disconnectCloudGroup()"
+            class="hidden py-3 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-extrabold text-xs border border-rose-200">
+            Disconnect
+          </button>
+          <button type="button" onclick="closeModal('syncModal')"
+            class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs">
+            Close
+          </button>
+          <button type="button" onclick="connectCloudGroupFromInput()"
+            class="flex-1 py-3 rounded-xl clubhouse-gradient text-white font-extrabold text-xs shadow-sm">
+            Connect &amp; Sync
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="fixed inset-0 z-50 hidden bg-black/50 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-2xl p-4 shadow-xl space-y-3">
+      <h3 id="confirmTitle" class="text-sm font-black text-slate-900">Confirm Action</h3>
+      <p id="confirmBody" class="text-xs text-slate-600"></p>
+      <div class="flex gap-2 pt-1">
+        <button onclick="closeModal('confirmModal')" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs">Cancel</button>
+        <button id="confirmOkBtn" class="flex-1 py-2.5 rounded-xl bg-rose-600 text-white font-extrabold text-xs">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. STATE INITIALIZATION & PERSISTENCE (WED & SAT SCHEDULE FROM 25 NOV 2026)
+    // =========================================================================
+    const STORAGE_KEY = 'golf_society_wed_sat_v1';
+    const GROUP_CODE_KEY = 'golf_society_group_code_v1';
+
+    function createDefaultPlayers() {
+      const initialHcps = [12, 18, 9, 22, 15, 11, 24, 16, 8, 20, 14, 19, 10, 25, 13, 17, 7, 21, 15, 23];
+      return Array.from({ length: 20 }, (_, i) => ({
+        id: `p_${i + 1}`,
+        name: `Player ${i + 1}`,
+        initialHcp: initialHcps[i] ?? 18
+      }));
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.players) && Array.isArray(parsed.sessions) && parsed.sessions.length > 0) {
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.warn('Could not load saved state:', e);
+      }
+
+      const firstSessionId = 'sess_2026_11_25';
+      return {
+        players: createDefaultPlayers(),
+        sessions: [
+          {
+            id: firstSessionId,
+            date: '2026-11-25', // Wednesday, 25 Nov 2026
+            entries: {}
+          }
+        ],
+        activeSessionId: firstSessionId,
+        activePlayerIndex: 0,
+        activeTab: 'entry'
+      };
+    }
+
+    let state = loadState();
+
+    function saveState(skipCloudPush = false) {
+      state.updatedAt = Date.now();
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn('Could not save state:', e);
+      }
+      if (!skipCloudPush && typeof window.pushStateToCloud === 'function') {
+        window.pushStateToCloud(state);
+      }
+    }
+
+    function getActiveSession() {
+      let sess = state.sessions.find(s => s.id === state.activeSessionId);
+      if (!sess) {
+        sess = state.sessions[0];
+        state.activeSessionId = sess.id;
+      }
+      return sess;
+    }
+
+    // =========================================================================
+    // 2. CORE HANDICAP & SCORING ENGINE (CHRONOLOGICAL ACROSS ALL SESSIONS)
+    // =========================================================================
+    function getOrderedSessions() {
+      return [...state.sessions].sort((a, b) => a.date.localeCompare(b.date));
+    }
+
+    function computeAllSessions() {
+      const orderedSessions = getOrderedSessions();
+      const runningHcp = {};
+      state.players.forEach(p => {
+        runningHcp[p.id] = Number(p.initialHcp) || 0;
+      });
+
+      const computedMap = {};
+
+      orderedSessions.forEach(sess => {
+        const rows = state.players.map(p => {
+          const entry = (sess.entries && sess.entries[p.id]) || {};
+          const startHcp = runningHcp[p.id];
+          const hasScore = entry.score !== null && entry.score !== undefined && entry.score !== '' && !Number.isNaN(Number(entry.score));
+          const stableford = hasScore ? Number(entry.score) : null;
+          const eighteenth = entry.eighteenth === 'Y' ? 'Y' : 'N';
+          const combined = hasScore ? stableford + (eighteenth === 'Y' ? 1 : 0) : null;
+
+          return {
+            playerId: p.id,
+            name: p.name,
+            startHcp,
+            hasScore,
+            stableford,
+            eighteenth,
+            combined,
+            isWinner: false,
+            isTiedTop: false,
+            winnerCut: 0,
+            eighteenthBonus: (hasScore && eighteenth === 'Y') ? 1 : 0,
+            newHcp: startHcp
+          };
+        });
+
+        const playedRows = rows.filter(r => r.hasScore);
+        const playersCount = playedRows.length;
+        const prizePot = playersCount * 2;
+
+        let topScore = null;
+        let secondScore = null;
+        let isTie = false;
+        let winnerRow = null;
+        let winnerCut = 0;
+
+        if (playersCount > 0) {
+          const sortedScores = playedRows.map(r => r.combined).sort((a, b) => b - a);
+          topScore = sortedScores[0];
+          secondScore = sortedScores.length > 1 ? sortedScores[1] : null;
+
+          const topHolders = playedRows.filter(r => r.combined === topScore);
+          if (topHolders.length > 1) {
+            isTie = true;
+            topHolders.forEach(r => {
+              r.isTiedTop = true;
+            });
+          } else {
+            winnerRow = topHolders[0];
+            winnerRow.isWinner = true;
+            const over36 = Math.max(0, winnerRow.combined - 36);
+            const marginOverSecond = secondScore !== null ? (winnerRow.combined - secondScore) : 0;
+            winnerCut = 1 + over36 + marginOverSecond;
+            winnerRow.winnerCut = winnerCut;
+          }
+        }
+
+        rows.forEach(r => {
+          const nextHcp = r.startHcp - r.winnerCut + r.eighteenthBonus;
+          r.newHcp = Math.round(nextHcp * 10) / 10;
+          runningHcp[r.playerId] = r.newHcp;
+        });
+
+        computedMap[sess.id] = {
+          rows,
+          playersCount,
+          prizePot,
+          topScore,
+          secondScore: secondScore !== null ? secondScore : '—',
+          isTie,
+          winnerRow,
+          winnerCut
+        };
+      });
+
+      return {
+        orderedSessions,
+        computedMap,
+        currentHcps: runningHcp
+      };
+    }
+
+    // =========================================================================
+    // 3. DATE HELPERS & POP-UP CALENDAR PICKER (WED & SAT SCHEDULE)
+    // =========================================================================
+    function formatFriendlyDate(isoDate) {
+      if (!isoDate) return '';
+      const [y, m, d] = isoDate.split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+      return dt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function formatShortDate(isoDate) {
+      if (!isoDate) return '';
+      const [y, m, d] = isoDate.split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+      return dt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+    }
+
+    function toIsoDate(dt) {
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth() + 1).padStart(2, '0');
+      const d = String(dt.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function getNextWedOrSat(fromIsoDate) {
+      const [y, m, d] = fromIsoDate.split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+      for (let i = 1; i <= 14; i++) {
+        dt.setDate(dt.getDate() + 1);
+        const day = dt.getDay();
+        if (day === 3 || day === 6) {
+          return toIsoDate(dt);
+        }
+      }
+      return toIsoDate(dt);
+    }
+
+    let calendarState = {
+      mode: 'new',
+      viewYear: 2026,
+      viewMonth: 10,
+      selectedIso: '2026-11-28'
+    };
+
+    function openCalendarModal(mode) {
+      calendarState.mode = mode;
+      const ordered = getOrderedSessions();
+      const activeSess = getActiveSession();
+
+      let baseIso;
+      if (mode === 'edit') {
+        baseIso = activeSess.date;
+        document.getElementById('calendarModalTitle').textContent = 'Reschedule Session Date';
+        document.getElementById('calendarModalSubtitle').textContent = 'Pick a new date if this round was moved for weather';
+        document.getElementById('calendarConfirmBtn').textContent = 'Update Date →';
+      } else {
+        const latestIso = ordered.length > 0 ? ordered[ordered.length - 1].date : activeSess.date;
+        baseIso = getNextWedOrSat(latestIso);
+        document.getElementById('calendarModalTitle').textContent = 'Schedule Next Session';
+        document.getElementById('calendarModalSubtitle').textContent = 'Tap any date to skip rained-off or no-play days';
+        document.getElementById('calendarConfirmBtn').textContent = 'Create Session →';
+      }
+
+      const [y, m] = baseIso.split('-').map(Number);
+      calendarState.selectedIso = baseIso;
+      calendarState.viewYear = y;
+      calendarState.viewMonth = m - 1;
+
+      renderCalendarGrid();
+      document.getElementById('calendarModal').classList.remove('hidden');
+    }
+
+    function changeCalendarMonth(delta) {
+      calendarState.viewMonth += delta;
+      if (calendarState.viewMonth < 0) {
+        calendarState.viewMonth = 11;
+        calendarState.viewYear -= 1;
+      } else if (calendarState.viewMonth > 11) {
+        calendarState.viewMonth = 0;
+        calendarState.viewYear += 1;
+      }
+      renderCalendarGrid();
+    }
+
+    function selectCalendarDay(isoDate) {
+      calendarState.selectedIso = isoDate;
+      renderCalendarGrid();
+    }
+
+    function jumpCalendarToNextPlayingDay() {
+      const nextIso = getNextWedOrSat(calendarState.selectedIso);
+      const [y, m] = nextIso.split('-').map(Number);
+      calendarState.selectedIso = nextIso;
+      calendarState.viewYear = y;
+      calendarState.viewMonth = m - 1;
+      renderCalendarGrid();
+    }
+
+    function renderCalendarGrid() {
+      const year = calendarState.viewYear;
+      const month = calendarState.viewMonth;
+      const firstOfMonth = new Date(year, month, 1);
+      document.getElementById('calendarMonthLabel').textContent =
+        firstOfMonth.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+
+      const startWeekday = (firstOfMonth.getDay() + 6) % 7;
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const existingDates = new Set(state.sessions.map(s => s.date));
+
+      const cells = [];
+      for (let empty = 0; empty < startWeekday; empty++) {
+        cells.push('<div></div>');
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dt = new Date(year, month, day);
+        const iso = toIsoDate(dt);
+        const dow = dt.getDay();
+        const isClubDay = dow === 3 || dow === 6;
+        const isSelected = iso === calendarState.selectedIso;
+        const hasSession = existingDates.has(iso);
+
+        let btnClass = 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100';
+        if (isSelected) {
+          btnClass = 'bg-[#1E4620] text-white border-[#1E4620] font-black shadow-sm scale-105';
+        } else if (isClubDay) {
+          btnClass = 'bg-emerald-50 text-[#1E4620] border-emerald-300 font-extrabold hover:bg-emerald-100';
+        }
+
+        cells.push(`
+          <button type="button" onclick="selectCalendarDay('${iso}')"
+            class="relative h-10 rounded-xl border text-xs font-bold flex flex-col items-center justify-center transition ${btnClass}">
+            <span>${day}</span>
+            ${hasSession ? `<span class="w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-amber-300' : 'bg-amber-500'} mt-0.5"></span>` : ''}
+          </button>
+        `);
+      }
+
+      document.getElementById('calendarDaysGrid').innerHTML = cells.join('');
+      document.getElementById('calendarSelectedDisplay').textContent = formatFriendlyDate(calendarState.selectedIso);
+
+      const activeSess = getActiveSession();
+      const collision = state.sessions.some(s =>
+        s.date === calendarState.selectedIso && (calendarState.mode === 'new' || s.id !== activeSess.id)
+      );
+      document.getElementById('calendarCollisionWarning').classList.toggle('hidden', !collision);
+    }
+
+    function confirmCalendarSelection() {
+      const chosenIso = calendarState.selectedIso;
+      if (calendarState.mode === 'edit') {
+        const activeSess = getActiveSession();
+        const duplicate = state.sessions.find(s => s.date === chosenIso && s.id !== activeSess.id);
+        if (duplicate) {
+          showToast('Another session already uses that date.');
+          return;
+        }
+        activeSess.date = chosenIso;
+        saveState();
+        closeModal('calendarModal');
+        renderAll();
+        showToast(`Session moved to ${formatShortDate(chosenIso)}`);
+      } else {
+        const existing = state.sessions.find(s => s.date === chosenIso);
+        if (existing) {
+          state.activeSessionId = existing.id;
+          state.activePlayerIndex = 0;
+          state.activeTab = 'entry';
+          saveState();
+          closeModal('calendarModal');
+          renderAll();
+          showToast(`Switched to existing session (${formatShortDate(chosenIso)})`);
+          return;
+        }
+
+        const newId = `sess_${chosenIso.replace(/-/g, '_')}_${Date.now().toString(36)}`;
+        state.sessions.push({
+          id: newId,
+          date: chosenIso,
+          entries: {}
+        });
+        state.activeSessionId = newId;
+        state.activePlayerIndex = 0;
+        state.activeTab = 'entry';
+        saveState();
+        closeModal('calendarModal');
+        renderAll();
+        showToast(`New session created for ${formatShortDate(chosenIso)}!`);
+      }
+    }
+
+    function deleteSession(sessionId) {
+      if (state.sessions.length <= 1) {
+        showToast('Cannot delete the only remaining session.');
+        return;
+      }
+      const target = state.sessions.find(s => s.id === sessionId);
+      if (!target) return;
+
+      openConfirmModal(
+        'Cancel / Delete Rained-Off Session?',
+        `Remove ${formatFriendlyDate(target.date)}? All remaining sessions will automatically recalculate their starting handicaps in date order.`,
+        () => {
+          state.sessions = state.sessions.filter(s => s.id !== sessionId);
+          if (state.activeSessionId === sessionId) {
+            const ordered = getOrderedSessions();
+            state.activeSessionId = ordered[ordered.length - 1].id;
+          }
+          saveState();
+          renderAll();
+          showToast('Session deleted & handicaps recalculated.');
+        }
+      );
+    }
+
+    // =========================================================================
+    // 4. SCORE ENTRY KEYPAD & PLAYER NAVIGATION HANDLERS
+    // =========================================================================
+    function getActivePlayerEntry() {
+      const sess = getActiveSession();
+      const player = state.players[state.activePlayerIndex];
+      if (!sess.entries) sess.entries = {};
+      if (!sess.entries[player.id]) {
+        sess.entries[player.id] = { score: null, eighteenth: 'N' };
+      }
+      return { sess, player, entry: sess.entries[player.id] };
+    }
+
+    function pressDigit(digit) {
+      const { entry } = getActivePlayerEntry();
+      const currentStr = (entry.score !== null && entry.score !== undefined) ? String(entry.score) : '';
+      const nextStr = (currentStr + digit).slice(0, 2);
+      entry.score = Number(nextStr);
+      saveState();
+      renderAll();
+    }
+
+    function backspaceDigit() {
+      const { entry } = getActivePlayerEntry();
+      if (entry.score === null || entry.score === undefined) return;
+      const str = String(entry.score);
+      if (str.length <= 1) {
+        entry.score = null;
+      } else {
+        entry.score = Number(str.slice(0, -1));
+      }
+      saveState();
+      renderAll();
+    }
+
+    function clearCurrentScore() {
+      const { entry } = getActivePlayerEntry();
+      entry.score = null;
+      entry.eighteenth = 'N';
+      saveState();
+      renderAll();
+    }
+
+    function setExactScore(val) {
+      const { entry } = getActivePlayerEntry();
+      entry.score = Number(val);
+      saveState();
+      renderAll();
+    }
+
+    function adjustScore(delta) {
+      const { entry } = getActivePlayerEntry();
+      const base = (entry.score !== null && entry.score !== undefined) ? Number(entry.score) : 36;
+      entry.score = Math.max(0, Math.min(99, base + delta));
+      saveState();
+      renderAll();
+    }
+
+    function setEighteenth(yn) {
+      const { entry } = getActivePlayerEntry();
+      entry.eighteenth = yn === 'Y' ? 'Y' : 'N';
+      saveState();
+      renderAll();
+    }
+
+    function selectPlayer(index) {
+      state.activePlayerIndex = Math.max(0, Math.min(state.players.length - 1, index));
+      saveState();
+      renderAll();
+      const pill = document.getElementById(`playerPill-${state.activePlayerIndex}`);
+      if (pill) {
+        pill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+
+    function nextPlayer() {
+      if (state.activePlayerIndex < state.players.length - 1) {
+        selectPlayer(state.activePlayerIndex + 1);
+      } else {
+        switchTab('results');
+        showToast('All 20 golfers reviewed!');
+      }
+    }
+
+    function prevPlayer() {
+      if (state.activePlayerIndex > 0) {
+        selectPlayer(state.activePlayerIndex - 1);
+      }
+    }
+
+    function skipPlayerDNP() {
+      clearCurrentScore();
+      nextPlayer();
+    }
+
+    function confirmClearSessionScores() {
+      const sess = getActiveSession();
+      openConfirmModal(
+        'Reset Today\'s Scores?',
+        `Clear all scores entered for ${formatFriendlyDate(sess.date)}?`,
+        () => {
+          sess.entries = {};
+          state.activePlayerIndex = 0;
+          saveState();
+          renderAll();
+          showToast('Session scores cleared.');
+        }
+      );
+    }
+
+    // =========================================================================
+    // 5. NAVIGATION, MODALS & TOAST NOTIFICATIONS
+    // =========================================================================
+    function switchTab(tabName) {
+      state.activeTab = tabName;
+      saveState();
+      renderAll();
+    }
+
+    function changeActiveSession(sessionId) {
+      state.activeSessionId = sessionId;
+      state.activePlayerIndex = 0;
+      saveState();
+      renderAll();
+    }
+
+    function closeModal(modalId) {
+      const el = document.getElementById(modalId);
+      if (el) el.classList.add('hidden');
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      const el = document.getElementById('toastBanner');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        el.classList.add('hidden');
+      }, 2800);
+    }
+
+    function openConfirmModal(title, body, onConfirm) {
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmBody').textContent = body;
+      const okBtn = document.getElementById('confirmOkBtn');
+      okBtn.onclick = () => {
+        closeModal('confirmModal');
+        onConfirm();
+      };
+      document.getElementById('confirmModal').classList.remove('hidden');
+    }
+
+    function openRosterJumpModal() {
+      const { computedMap } = computeAllSessions();
+      const comp = computedMap[getActiveSession().id];
+      const grid = document.getElementById('rosterJumpGrid');
+      grid.innerHTML = comp.rows.map((r, i) => `
+        <button type="button" onclick="selectPlayer(${i}); closeModal('rosterJumpModal')"
+          class="w-full px-3 py-2.5 rounded-xl border text-left flex items-center justify-between transition ${
+            i === state.activePlayerIndex
+              ? 'bg-emerald-50 border-[#1E4620] font-black'
+              : 'bg-white border-slate-200 hover:bg-slate-50 font-bold'
+          }">
+          <span class="text-xs text-slate-900 truncate">${i + 1}. ${escapeHtml(r.name)}</span>
+          <span class="text-xs text-emerald-800 shrink-0">
+            ${r.hasScore ? `${r.combined} pts (Hcp ${r.newHcp})` : `Start Hcp: ${r.startHcp}`}
+          </span>
+        </button>
+      `).join('');
+      document.getElementById('rosterJumpModal').classList.remove('hidden');
+    }
+
+    // =========================================================================
+    // 6. ROSTER EDITOR & CSV / EXCEL EXPORT
+    // =========================================================================
+    function openRosterModal() {
+      const list = document.getElementById('rosterEditFormList');
+      list.innerHTML = state.players.map((p, idx) => `
+        <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
+          <span class="text-xs font-black text-slate-400 w-6 text-center">${idx + 1}.</span>
+          <input type="text" id="editPlayerName_${idx}" value="${escapeHtml(p.name)}"
+            class="flex-1 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-900" />
+          <div class="flex items-center gap-1">
+            <span class="text-[10px] font-bold text-slate-500 uppercase">Start Hcp</span>
+            <input type="number" step="0.5" id="editPlayerHcp_${idx}" value="${p.initialHcp}"
+              class="w-16 bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-black text-center text-[#1E4620]" />
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('rosterModal').classList.remove('hidden');
+    }
+
+    function saveRosterChanges() {
+      state.players.forEach((p, idx) => {
+        const nameInput = document.getElementById(`editPlayerName_${idx}`);
+        const hcpInput = document.getElementById(`editPlayerHcp_${idx}`);
+        if (nameInput && nameInput.value.trim()) {
+          p.name = nameInput.value.trim();
+        }
+        if (hcpInput && hcpInput.value !== '' && !Number.isNaN(Number(hcpInput.value))) {
+          p.initialHcp = Number(hcpInput.value);
+        }
+      });
+      saveState();
+      closeModal('rosterModal');
+      renderAll();
+      showToast('Roster & starting handicaps updated!');
+    }
+
+    function exportToCSV() {
+      const { orderedSessions, computedMap } = computeAllSessions();
+      const headers = ['Player #', 'Player Name', 'Initial Hcp'];
+      orderedSessions.forEach(s => {
+        headers.push(`${s.date} Start`, `${s.date} Score`, `${s.date} 18th`, `${s.date} Combined`, `${s.date} Result`, `${s.date} New Hcp`);
+      });
+
+      const lines = [headers.map(h => `"${h}"`).join(',')];
+      state.players.forEach((p, idx) => {
+        const rowCells = [idx + 1, `"${p.name.replace(/"/g, '""')}"`, p.initialHcp];
+        orderedSessions.forEach(s => {
+          const r = computedMap[s.id].rows.find(item => item.playerId === p.id);
+          rowCells.push(
+            r.startHcp,
+            r.hasScore ? r.stableford : '',
+            r.hasScore ? r.eighteenth : '',
+            r.hasScore ? r.combined : '',
+            r.isWinner ? 'WINNER' : (r.isTiedTop ? 'TIE' : ''),
+            r.newHcp
+          );
+        });
+        lines.push(rowCells.join(','));
+      });
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(lines.join('\n'));
+      const link = document.createElement('a');
+      link.setAttribute('href', csvContent);
+      link.setAttribute('download', `Golf_Society_Handicaps_${getActiveSession().date}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('CSV exported for Excel / Sheets!');
+    }
+
+    // =========================================================================
+    // 7B. WHATSAPP / CLIPBOARD SUMMARY & JSON BACKUP / RESTORE
+    // =========================================================================
+    function buildRoundSummaryText() {
+      const { computedMap } = computeAllSessions();
+      const sess = getActiveSession();
+      const comp = computedMap[sess.id];
+      const lines = [];
+      lines.push(`⛳ *Golf Society Results — ${formatFriendlyDate(sess.date)}*`);
+      lines.push(`Players: ${comp.playersCount}/20 | Prize Pot: £${comp.prizePot}`);
+      lines.push('');
+
+      if (comp.playersCount === 0) {
+        lines.push('No scores recorded yet.');
+      } else if (comp.isTie) {
+        lines.push(`🤝 *Today's result is a TIE — no winner and all £${comp.prizePot} is returned (no rollover).*`);
+      } else {
+        lines.push(`🏆 *Today's winner is ${comp.winnerRow.name} and he wins £${comp.prizePot}* (Combined ${comp.winnerRow.combined} pts, Cut -${comp.winnerRow.winnerCut})`);
+      }
+
+      lines.push('');
+      lines.push('*Scores & New Handicaps:*');
+      comp.rows
+        .filter(r => r.hasScore)
+        .sort((a, b) => b.combined - a.combined)
+        .forEach((r, idx) => {
+          const tag = r.isWinner ? ' 🏆' : (r.isTiedTop ? ' 🤝' : '');
+          lines.push(`${idx + 1}. ${r.name}: ${r.stableford} (18th: ${r.eighteenth}) = ${r.combined} pts | Hcp ${r.startHcp} → ${r.newHcp}${tag}`);
+        });
+
+      return lines.join('\n');
+    }
+
+    function shareResultsWhatsApp() {
+      const text = buildRoundSummaryText();
+      const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+    function copyResultsSummary() {
+      const text = buildRoundSummaryText();
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast('Round results copied to clipboard!');
+      } catch (e) {
+        showToast('Could not copy summary');
+      }
+      document.body.removeChild(ta);
+    }
+
+    function exportJsonBackup() {
+      const payload = JSON.stringify(state, null, 2);
+      const blob = new Blob([payload], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Golf_Society_Backup_${getActiveSession().date}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Full backup file downloaded!');
+    }
+
+    function importJsonBackup(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed && Array.isArray(parsed.players) && Array.isArray(parsed.sessions) && parsed.sessions.length > 0) {
+            state = parsed;
+            saveState();
+            renderAll();
+            showToast('Backup restored successfully!');
+          } else {
+            showToast('Invalid backup file format.');
+          }
+        } catch (err) {
+          showToast('Could not read backup file.');
+        }
+        event.target.value = '';
+      };
+      reader.readAsText(file);
+    }
+
+    // =========================================================================
+    // 7C. PROGRESSIVE WEB APP (PWA) MANIFEST, ICON & OFFLINE SERVICE WORKER
+    // =========================================================================
+    let deferredInstallPrompt = null;
+
+    function initPwaCapabilities() {
+      // Custom crisp SVG Golf Flag app icon
+      const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <defs>
+          <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#1E4620"/>
+            <stop offset="100%" stop-color="#2E6B31"/>
+          </linearGradient>
+        </defs>
+        <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+        <ellipse cx="256" cy="402" rx="140" ry="34" fill="#132E15"/>
+        <ellipse cx="236" cy="400" rx="22" ry="9" fill="#0B1C0C"/>
+        <rect x="231" y="112" width="12" height="288" rx="6" fill="#F8FAFC"/>
+        <path d="M243 118 L388 164 L243 212 Z" fill="#FBBF24"/>
+        <circle cx="292" cy="382" r="18" fill="#FFFFFF"/>
+      </svg>`;
+
+      const iconDataUri = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgIcon);
+      const appleLink = document.getElementById('appleTouchIconLink');
+      if (appleLink) appleLink.href = iconDataUri;
+
+      const manifestObj = {
+        name: 'Golf Society Handicap & Score Tracker',
+        short_name: 'Golf Society',
+        description: 'Mobile Stableford score entry, 18th hole bonus, and automatic handicap tracker.',
+        start_url: window.location.href,
+        display: 'standalone',
+        background_color: '#F3F6F4',
+        theme_color: '#1E4620',
+        icons: [
+          {
+            src: iconDataUri,
+            sizes: '512x512',
+            type: 'image/svg+xml',
+            purpose: 'any maskable'
+          }
+        ]
+      };
+
+      try {
+        const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+        const manifestUrl = URL.createObjectURL(manifestBlob);
+        const manifestLink = document.getElementById('pwaManifestLink');
+        if (manifestLink) manifestLink.href = manifestUrl;
+      } catch (e) {
+        console.warn('Manifest blob skipped:', e);
+      }
+
+      // Register lightweight offline Service Worker when supported
+      if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
+        const swCode = `
+          const CACHE_NAME = 'golf-society-pwa-v1';
+          self.addEventListener('install', (event) => {
+            self.skipWaiting();
+          });
+          self.addEventListener('activate', (event) => {
+            event.waitUntil(self.clients.claim());
+          });
+          self.addEventListener('fetch', (event) => {
+            if (event.request.method !== 'GET') return;
+            event.respondWith(
+              caches.open(CACHE_NAME).then((cache) =>
+                fetch(event.request)
+                  .then((networkResp) => {
+                    if (networkResp && networkResp.status === 200) {
+                      cache.put(event.request, networkResp.clone());
+                    }
+                    return networkResp;
+                  })
+                  .catch(() => cache.match(event.request))
+              )
+            );
+          });
+        `;
+        try {
+          const swBlob = new Blob([swCode], { type: 'application/javascript' });
+          const swUrl = URL.createObjectURL(swBlob);
+          navigator.serviceWorker.register(swUrl).catch(() => {});
+        } catch (e) {
+          // Safe fallback if hosted inside sandboxed iframe
+        }
+      }
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        const nativeRow = document.getElementById('nativeInstallRow');
+        if (nativeRow) nativeRow.classList.remove('hidden');
+      });
+    }
+
+    function triggerPwaInstall() {
+      const nativeRow = document.getElementById('nativeInstallRow');
+      if (nativeRow) {
+        nativeRow.classList.toggle('hidden', !deferredInstallPrompt);
+      }
+      document.getElementById('installGuideModal').classList.remove('hidden');
+    }
+
+    async function promptNativeInstall() {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      if (choice && choice.outcome === 'accepted') {
+        showToast('App installed to your Home Screen!');
+        closeModal('installGuideModal');
+      }
+      deferredInstallPrompt = null;
+    }
+
+    // =========================================================================
+    // 7D. MULTI-DEVICE SYNC UI HOOKS (CONNECTED TO FIREBASE MODULE BELOW)
+    // =========================================================================
+    function openSyncModal() {
+      const savedCode = localStorage.getItem(GROUP_CODE_KEY) || '';
+      const input = document.getElementById('groupCodeInput');
+      if (input) input.value = savedCode;
+      updateSyncStatusUI();
+      document.getElementById('syncModal').classList.remove('hidden');
+    }
+
+    function generateRandomGroupCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = 'GOLF-';
+      for (let i = 0; i < 4; i++) {
+        code += chars[Math.floor(Math.random() * chars.length)];
+      }
+      const input = document.getElementById('groupCodeInput');
+      if (input) input.value = code;
+    }
+
+    function connectCloudGroupFromInput() {
+      const input = document.getElementById('groupCodeInput');
+      const raw = (input ? input.value : '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+      if (!raw || raw.length < 3) {
+        showToast('Please enter a Group Code (at least 3 letters/numbers).');
+        return;
+      }
+      localStorage.setItem(GROUP_CODE_KEY, raw);
+      if (typeof window.connectToCloudGroup === 'function') {
+        window.connectToCloudGroup(raw, true);
+      }
+    }
+
+    function disconnectCloudGroup() {
+      localStorage.removeItem(GROUP_CODE_KEY);
+      if (typeof window.disconnectFromCloudGroup === 'function') {
+        window.disconnectFromCloudGroup();
+      }
+      updateSyncStatusUI();
+      showToast('Switched to local-only mode.');
+    }
+
+    function updateSyncStatusUI(statusInfo) {
+      const info = statusInfo || window.cloudSyncState || { connected: false, groupCode: '', message: 'Local-only mode' };
+      const dot = document.getElementById('syncStatusDot');
+      const text = document.getElementById('syncStatusText');
+      const seasonBadge = document.getElementById('seasonSyncBadge');
+      const modalBanner = document.getElementById('syncConnectionBanner');
+      const disconnectBtn = document.getElementById('disconnectSyncBtn');
+
+      if (info.connected && info.groupCode) {
+        if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse';
+        if (text) text.textContent = info.groupCode;
+        if (seasonBadge) {
+          seasonBadge.className = 'text-[10px] font-extrabold px-2 py-1 rounded-lg bg-emerald-100 text-[#1E4620]';
+          seasonBadge.textContent = `Live: ${info.groupCode}`;
+        }
+        if (modalBanner) {
+          modalBanner.className = 'text-xs font-bold text-[#1E4620] bg-emerald-50 border border-emerald-200 rounded-xl p-2.5';
+          modalBanner.textContent = `Connected to Group "${info.groupCode}" — syncing live across devices.`;
+        }
+        if (disconnectBtn) disconnectBtn.classList.remove('hidden');
+      } else {
+        if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-300';
+        if (text) text.textContent = info.groupCode ? info.groupCode : 'Sync';
+        if (seasonBadge) {
+          seasonBadge.className = 'text-[10px] font-extrabold px-2 py-1 rounded-lg bg-slate-100 text-slate-600';
+          seasonBadge.textContent = 'Local Mode';
+        }
+        if (modalBanner) {
+          modalBanner.className = 'text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200 rounded-xl p-2.5';
+          modalBanner.textContent = info.message || 'Not connected to a shared group yet.';
+        }
+        if (disconnectBtn) disconnectBtn.classList.add('hidden');
+      }
+    }
+
+    // =========================================================================
+    // 8. MASTER RENDER FUNCTION
+    // =========================================================================
+    function renderAll() {
+      const { orderedSessions, computedMap, currentHcps } = computeAllSessions();
+      const activeSession = getActiveSession();
+      const activeComp = computedMap[activeSession.id];
+
+      // 1. Update Session Selector Dropdown & Delete Button State
+      const sessionSelect = document.getElementById('sessionSelect');
+      sessionSelect.innerHTML = orderedSessions.map(s => `
+        <option value="${s.id}" ${s.id === activeSession.id ? 'selected' : ''}>
+          ${formatShortDate(s.date)}
+        </option>
+      `).join('');
+      sessionSelect.onchange = (e) => changeActiveSession(e.target.value);
+
+      const canDelete = orderedSessions.length > 1;
+      const headerDelBtn = document.getElementById('headerDeleteSessionBtn');
+      if (headerDelBtn) {
+        headerDelBtn.classList.toggle('opacity-40', !canDelete);
+      }
+
+      document.getElementById('headerSubtext').textContent =
+        `${formatFriendlyDate(activeSession.date)} • ${activeComp.playersCount}/20 Played`;
+
+      // 2. Update Tabs Visibility
+      ['entry', 'results', 'season'].forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tabBtn-${t}`);
+        if (state.activeTab === t) {
+          view.classList.remove('hidden');
+          btn.className = 'py-2 px-2 rounded-lg text-xs font-extrabold transition text-center bg-white text-[#1E4620] shadow-sm';
+        } else {
+          view.classList.add('hidden');
+          btn.className = 'py-2 px-2 rounded-lg text-xs font-bold transition text-center text-emerald-100 hover:text-white';
+        }
+      });
+
+      // 3. Render Exact Winner / Tie Declaration Banner
+      const banner = document.getElementById('declarationBanner');
+      if (activeComp.playersCount === 0) {
+        banner.className = 'rounded-2xl p-3.5 mb-3 shadow-sm bg-white border border-emerald-900/15';
+        banner.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <span class="text-xl">🏌️</span>
+            <div>
+              <div class="text-xs font-extrabold uppercase tracking-wider text-emerald-800">Awaiting Today's Scores</div>
+              <div class="text-xs text-slate-600 font-medium">Enter scores below — £2 per player pot updates live.</div>
+            </div>
+          </div>
+        `;
+      } else if (activeComp.isTie) {
+        banner.className = 'rounded-2xl p-3.5 mb-3 shadow-sm tie-banner';
+        banner.innerHTML = `
+          <div class="flex items-start gap-2.5">
+            <span class="text-xl leading-none mt-0.5">🤝</span>
+            <div>
+              <div class="text-[11px] font-black uppercase tracking-wider text-rose-700">Tie for 1st Place (${activeComp.topScore} pts)</div>
+              <div class="text-sm font-black text-rose-950 leading-snug mt-0.5">
+                Today's result is a TIE — no winner and all £${activeComp.prizePot} is returned (no rollover).
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        const w = activeComp.winnerRow;
+        banner.className = 'rounded-2xl p-3.5 mb-3 shadow-sm gold-banner';
+        banner.innerHTML = `
+          <div class="flex items-start gap-2.5">
+            <span class="text-2xl leading-none mt-0.5">🏆</span>
+            <div>
+              <div class="text-[11px] font-black uppercase tracking-wider text-amber-800">
+                Leader Declaration • Combined ${w.combined} pts (Cut: -${w.winnerCut})
+              </div>
+              <div class="text-sm sm:text-base font-black text-amber-950 leading-snug mt-0.5">
+                Today's winner is ${escapeHtml(w.name)} and he wins £${activeComp.prizePot}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // 4. Render Entry View (Wizard Card + Pill Strip)
+      renderEntryView(activeComp);
+
+      // 5. Render Today's Results View
+      renderResultsView(activeSession, activeComp);
+
+      // 6. Render Season & Roster View
+      renderSeasonView(orderedSessions, computedMap, currentHcps);
+    }
+
+    function renderEntryView(activeComp) {
+      const idx = state.activePlayerIndex;
+      const row = activeComp.rows[idx] || activeComp.rows[0];
+
+      document.getElementById('entryProgressLabel').textContent =
+        `Player ${idx + 1} of ${activeComp.rows.length} • ${activeComp.playersCount} Entered`;
+
+      // Player Pills
+      const strip = document.getElementById('playerPillStrip');
+      strip.innerHTML = activeComp.rows.map((r, i) => {
+        const isCurrent = i === idx;
+        let pillStyle = 'bg-slate-100 text-slate-600 border-slate-200';
+        if (r.isWinner) pillStyle = 'bg-amber-300 text-amber-950 border-amber-500 font-black';
+        else if (r.hasScore) pillStyle = 'bg-emerald-100 text-[#1E4620] border-emerald-300 font-extrabold';
+
+        const ring = isCurrent ? 'ring-2 ring-[#1E4620] scale-105 bg-white font-black text-slate-900' : '';
+        return `
+          <button id="playerPill-${i}" onclick="selectPlayer(${i})"
+            class="shrink-0 px-2.5 py-1.5 rounded-xl text-xs border transition ${pillStyle} ${ring}">
+            ${i + 1}. ${escapeHtml(r.name.split(' ')[0])}${r.hasScore ? ` (${r.combined})` : ''}
+          </button>
+        `;
+      }).join('');
+
+      // Active Card Fields
+      document.getElementById('cardPlayerBadge').textContent = `#${idx + 1}`;
+      document.getElementById('cardPlayerName').textContent = row.name;
+      document.getElementById('cardStartHcp').textContent = row.startHcp;
+      document.getElementById('cardNewHcp').textContent = row.newHcp;
+
+      const statusBadge = document.getElementById('cardStatusBadge');
+      if (row.isWinner) {
+        statusBadge.className = 'inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-black bg-amber-200 text-amber-950';
+        statusBadge.textContent = `🏆 WINNER (-${row.winnerCut} Hcp)`;
+      } else if (row.isTiedTop) {
+        statusBadge.className = 'inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-rose-100 text-rose-800';
+        statusBadge.textContent = 'Tied 1st (No Cut)';
+      } else if (row.hasScore) {
+        statusBadge.className = 'inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 text-[#1E4620]';
+        statusBadge.textContent = 'Score Entered';
+      } else {
+        statusBadge.className = 'inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-500';
+        statusBadge.textContent = 'Not Entered';
+      }
+
+      document.getElementById('scoreDisplay').textContent = row.hasScore ? row.stableford : '—';
+      document.getElementById('cardCombinedScore').textContent = row.hasScore ? `${row.combined} pts` : '—';
+
+      // 18th Hole Toggle Buttons
+      const btnYes = document.getElementById('btn18Yes');
+      const btnNo = document.getElementById('btn18No');
+      if (row.eighteenth === 'Y') {
+        btnYes.className = 'keypad-btn py-3.5 px-3 rounded-2xl border-2 border-[#1E4620] bg-[#1E4620] text-white font-black text-base flex flex-col items-center justify-center shadow-sm';
+        btnNo.className = 'keypad-btn py-3.5 px-3 rounded-2xl border-2 border-slate-200 bg-slate-50 text-slate-600 font-bold text-base flex flex-col items-center justify-center';
+      } else {
+        btnYes.className = 'keypad-btn py-3.5 px-3 rounded-2xl border-2 border-slate-200 bg-slate-50 text-slate-600 font-bold text-base flex flex-col items-center justify-center';
+        btnNo.className = 'keypad-btn py-3.5 px-3 rounded-2xl border-2 border-slate-800 bg-slate-800 text-white font-black text-base flex flex-col items-center justify-center shadow-sm';
+      }
+    }
+
+    function renderResultsView(activeSession, activeComp) {
+      document.getElementById('resultsSessionDateText').textContent = formatFriendlyDate(activeSession.date);
+      const resDelBtn = document.getElementById('resultsDeleteSessionBtn');
+      if (resDelBtn) {
+        resDelBtn.classList.toggle('hidden', state.sessions.length <= 1);
+      }
+      document.getElementById('kpiPlayed').textContent = `${activeComp.playersCount}/20`;
+      document.getElementById('kpiPot').textContent = `£${activeComp.prizePot}`;
+      document.getElementById('kpiTopSecond').textContent =
+        activeComp.playersCount > 0 ? `${activeComp.topScore} / ${activeComp.secondScore}` : '— / —';
+      document.getElementById('kpiCut').textContent = activeComp.winnerCut > 0 ? `-${activeComp.winnerCut}` : '0';
+
+      const container = document.getElementById('resultsListContainer');
+      container.innerHTML = activeComp.rows.map((r, idx) => {
+        const rowBg = r.isWinner ? 'bg-amber-50/90' : (r.isTiedTop ? 'bg-rose-50/50' : 'bg-white hover:bg-slate-50');
+        const netDelta = r.newHcp - r.startHcp;
+        const deltaText = netDelta === 0 ? '0' : (netDelta > 0 ? `+${netDelta}` : `${netDelta}`);
+        const deltaColor = netDelta < 0 ? 'text-rose-700' : (netDelta > 0 ? 'text-emerald-700' : 'text-slate-400');
+
+        return `
+          <div onclick="selectPlayer(${idx}); switchTab('entry')"
+            class="px-3.5 py-2.5 flex items-center justify-between gap-2 cursor-pointer transition ${rowBg}">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-bold text-slate-400 w-5">${idx + 1}.</span>
+                <span class="text-sm font-extrabold text-slate-900 truncate">${escapeHtml(r.name)}</span>
+                ${r.isWinner ? '<span class="px-1.5 py-0.5 rounded bg-amber-300 text-amber-950 text-[10px] font-black">WIN</span>' : ''}
+                ${r.isTiedTop ? '<span class="px-1.5 py-0.5 rounded bg-rose-200 text-rose-900 text-[10px] font-black">TIE</span>' : ''}
+              </div>
+              <div class="text-[11px] text-slate-500 pl-6 font-medium">
+                ${r.hasScore
+                  ? `Score: <strong>${r.stableford}</strong> • 18th: <strong>${r.eighteenth}</strong> • Combined: <strong class="text-slate-800">${r.combined}</strong>`
+                  : 'Did Not Play'}
+              </div>
+            </div>
+
+            <div class="text-right shrink-0">
+              <div class="text-xs font-black text-slate-900">
+                ${r.startHcp} → <span class="text-[#1E4620] text-sm">${r.newHcp}</span>
+              </div>
+              <div class="text-[10px] font-extrabold ${deltaColor}">
+                Net ${deltaText}${r.winnerCut ? ` (Cut -${r.winnerCut})` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderSeasonView(orderedSessions, computedMap, currentHcps) {
+      document.getElementById('seasonCountLabel').textContent = orderedSessions.length;
+
+      // Aggregate season stats per player
+      const stats = state.players.map(p => {
+        let games = 0;
+        let wins = 0;
+        let winnings = 0;
+        orderedSessions.forEach(s => {
+          const comp = computedMap[s.id];
+          const r = comp.rows.find(row => row.playerId === p.id);
+          if (r && r.hasScore) games++;
+          if (r && r.isWinner) {
+            wins++;
+            winnings += comp.prizePot;
+          }
+        });
+        return {
+          ...p,
+          games,
+          wins,
+          winnings,
+          currentHcp: currentHcps[p.id]
+        };
+      });
+
+      // Sort by Wins desc, then Winnings desc, then lowest Current Hcp
+      stats.sort((a, b) => b.wins - a.wins || b.winnings - a.winnings || a.currentHcp - b.currentHcp);
+
+      const standingsEl = document.getElementById('seasonStandingsList');
+      standingsEl.innerHTML = stats.map((st, rank) => {
+        const netChange = Math.round((st.currentHcp - st.initialHcp) * 10) / 10;
+        const netLabel = netChange === 0 ? '0' : (netChange > 0 ? `+${netChange}` : `${netChange}`);
+        const netColor = netChange < 0 ? 'text-rose-700' : (netChange > 0 ? 'text-emerald-700' : 'text-slate-500');
+        return `
+          <div class="px-3.5 py-2.5 flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-black text-slate-400 w-5">${rank + 1}.</span>
+                <span class="text-sm font-extrabold text-slate-900 truncate">${escapeHtml(st.name)}</span>
+              </div>
+              <div class="text-[11px] text-slate-500 pl-6 font-medium">
+                Played: ${st.games} • Init: ${st.initialHcp} → Now: <strong class="text-[#1E4620]">${st.currentHcp}</strong>
+                <span class="font-bold ${netColor}">(${netLabel})</span>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <div class="text-xs font-black text-amber-800 bg-amber-100 px-2 py-0.5 rounded-md inline-block">
+                ${st.wins} ${st.wins === 1 ? 'Win' : 'Wins'} • £${st.winnings}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const historyEl = document.getElementById('sessionHistoryList');
+      if (historyEl) {
+        historyEl.innerHTML = [...orderedSessions].reverse().map(s => {
+          const comp = computedMap[s.id];
+          const isCurrent = s.id === state.activeSessionId;
+          const summary = comp.playersCount === 0
+            ? 'No scores entered'
+            : (comp.isTie
+                ? `Tie (${comp.topScore} pts) • £${comp.prizePot} returned`
+                : `Winner: ${escapeHtml(comp.winnerRow.name)} (£${comp.prizePot})`);
+          return `
+            <div class="flex items-center justify-between gap-2 p-2.5 rounded-xl border ${isCurrent ? 'bg-emerald-50 border-emerald-300' : 'bg-slate-50 border-slate-200'}">
+              <button type="button" onclick="changeActiveSession('${s.id}'); switchTab('results')" class="text-left min-w-0 flex-1">
+                <div class="text-xs font-extrabold text-slate-900">${formatFriendlyDate(s.date)}</div>
+                <div class="text-[11px] text-slate-600 truncate">${comp.playersCount}/20 played • ${summary}</div>
+              </button>
+              ${orderedSessions.length > 1 ? `
+                <button type="button" onclick="deleteSession('${s.id}')"
+                  class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-extrabold text-[11px] border border-rose-200 shrink-0">
+                  Delete
+                </button>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Boot App
+    initPwaCapabilities();
+    renderAll();
+
+    // Auto-reconnect saved Group Code if configured
+    const initialSavedCode = localStorage.getItem(GROUP_CODE_KEY);
+    if (initialSavedCode) {
+      window.cloudSyncState = {
+        connected: false,
+        groupCode: initialSavedCode,
+        message: 'Connecting to shared group...'
+      };
+      updateSyncStatusUI();
+    }
+  </script>
+
+  <!-- ========================================================= -->
+  <!-- FIREBASE REAL-TIME SYNC MODULE (OPTIONAL MULTI-DEVICE)    -->
+  <!-- ========================================================= -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+    import { getFirestore, doc, getDoc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'golf-society-app';
+    let db = null;
+    let currentUser = null;
+    let unsubscribeGroup = null;
+    let isApplyingRemoteUpdate = false;
+
+    async function initCloudBackend() {
+      try {
+        if (typeof __firebase_config === 'undefined' || !__firebase_config) {
+          window.cloudSyncState = {
+            connected: false,
+            groupCode: localStorage.getItem(GROUP_CODE_KEY) || '',
+            message: 'Running in offline-ready local mode.'
+          };
+          updateSyncStatusUI();
+          return;
+        }
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        db = getFirestore(app);
+
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+
+        onAuthStateChanged(auth, (user) => {
+          currentUser = user;
+          const savedCode = localStorage.getItem(GROUP_CODE_KEY);
+          if (user && savedCode) {
+            window.connectToCloudGroup(savedCode, false);
+          }
+        });
+      } catch (err) {
+        console.warn('Cloud sync unavailable, running in local mode:', err);
+        window.cloudSyncState = {
+          connected: false,
+          groupCode: localStorage.getItem(GROUP_CODE_KEY) || '',
+          message: 'Offline mode active (data saved safely on this phone).'
+        };
+        updateSyncStatusUI();
+      }
+    }
+
+    window.connectToCloudGroup = async function(groupCode, isUserInitiated) {
+      if (!db || !currentUser) {
+        window.cloudSyncState = {
+          connected: false,
+          groupCode,
+          message: 'Saved locally. Cloud sync connects automatically when online.'
+        };
+        updateSyncStatusUI();
+        if (isUserInitiated) showToast(`Group Code ${groupCode} saved!`);
+        return;
+      }
+
+      if (unsubscribeGroup) {
+        unsubscribeGroup();
+        unsubscribeGroup = null;
+      }
+
+      const groupDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'golf_groups', groupCode);
+
+      try {
+        // Check if group already exists in the cloud
+        const snap = await getDoc(groupDocRef);
+        if (snap.exists() && snap.data() && snap.data().payload) {
+          const remoteState = JSON.parse(snap.data().payload);
+          if (remoteState && Array.isArray(remoteState.players) && Array.isArray(remoteState.sessions)) {
+            isApplyingRemoteUpdate = true;
+            state = remoteState;
+            saveState(true);
+            renderAll();
+            isApplyingRemoteUpdate = false;
+          }
+        } else {
+          // Seed the new cloud group with current device's data
+          await setDoc(groupDocRef, {
+            payload: JSON.stringify(state),
+            updatedAt: Date.now(),
+            updatedBy: currentUser.uid
+          });
+        }
+
+        // Listen for real-time updates from any connected committee phone
+        unsubscribeGroup = onSnapshot(
+          groupDocRef,
+          (docSnap) => {
+            if (!docSnap.exists() || !docSnap.data() || !docSnap.data().payload) return;
+            try {
+              const incoming = JSON.parse(docSnap.data().payload);
+              if (!incoming || !Array.isArray(incoming.players) || !Array.isArray(incoming.sessions)) return;
+              if ((incoming.updatedAt || 0) > (state.updatedAt || 0)) {
+                isApplyingRemoteUpdate = true;
+                const keepTab = state.activeTab;
+                const keepPlayerIdx = state.activePlayerIndex;
+                state = incoming;
+                state.activeTab = keepTab;
+                state.activePlayerIndex = Math.min(keepPlayerIdx, state.players.length - 1);
+                saveState(true);
+                renderAll();
+                isApplyingRemoteUpdate = false;
+              }
+            } catch (parseErr) {
+              console.warn('Error parsing synced state:', parseErr);
+            }
+          },
+          (err) => {
+            console.warn('Sync listener error:', err);
+            window.cloudSyncState = {
+              connected: false,
+              groupCode,
+              message: 'Connection paused — working offline.'
+            };
+            updateSyncStatusUI();
+          }
+        );
+
+        window.cloudSyncState = {
+          connected: true,
+          groupCode,
+          message: `Synced with ${groupCode}`
+        };
+        updateSyncStatusUI();
+        if (isUserInitiated) {
+          closeModal('syncModal');
+          showToast(`Connected to live group ${groupCode}!`);
+        }
+      } catch (e) {
+        console.warn('Failed to connect to cloud group:', e);
+        window.cloudSyncState = {
+          connected: false,
+          groupCode,
+          message: 'Could not reach server — changes saved offline.'
+        };
+        updateSyncStatusUI();
+      }
+    };
+
+    window.disconnectFromCloudGroup = function() {
+      if (unsubscribeGroup) {
+        unsubscribeGroup();
+        unsubscribeGroup = null;
+      }
+      window.cloudSyncState = {
+        connected: false,
+        groupCode: '',
+        message: 'Disconnected — local-only mode.'
+      };
+      updateSyncStatusUI();
+    };
+
+    window.pushStateToCloud = async function(latestState) {
+      if (isApplyingRemoteUpdate || !db || !currentUser) return;
+      const groupCode = localStorage.getItem(GROUP_CODE_KEY);
+      if (!groupCode) return;
+
+      try {
+        const groupDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'golf_groups', groupCode);
+        await setDoc(groupDocRef, {
+          payload: JSON.stringify(latestState),
+          updatedAt: latestState.updatedAt || Date.now(),
+          updatedBy: currentUser.uid
+        });
+      } catch (err) {
+        // Offline queue: will re-sync on next save when back online
+      }
+    };
+
+    initCloudBackend();
+  </script>
+</body>
+</html>
