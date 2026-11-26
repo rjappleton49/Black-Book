@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#1B4332" />
+  <title>WGC Black Book Boys — Accumulated Extras Scorer</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23111827'/%3E%3Crect x='14' y='10' width='36' height='44' rx='4' fill='%230B0F19' stroke='%23D4AF37' stroke-width='2.5'/%3E%3Cline x1='20' y1='10' x2='20' y2='54' stroke='%23D4AF37' stroke-width='2'/%3E%3Cpath d='M42 10v11l-3-2.5-3 2.5V10z' fill='%23D4AF37'/%3E%3Ctext x='36' y='37' text-anchor='middle' font-family='Georgia,serif' font-weight='bold' font-size='10.5' fill='%23F5D061'%3EWGC%3C/text%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='38' fill='%23111827'/%3E%3Crect x='38' y='26' width='104' height='128' rx='10' fill='%23090D16' stroke='%23D4AF37' stroke-width='6'/%3E%3Cline x1='55' y1='26' x2='55' y2='154' stroke='%23D4AF37' stroke-width='5'/%3E%3Cpath d='M120 26v30l-8-7-8 7V26z' fill='%23D4AF37'/%3E%3Ctext x='99' y='104' text-anchor='middle' font-family='Georgia,serif' font-weight='bold' font-size='30' fill='%23F5D061'%3EWGC%3C/text%3E%3C/svg%3E" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background-color: #F3F5F2;
+      color: #0F172A;
+      overscroll-behavior-y: contain;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .clubhouse-gradient {
+      background: linear-gradient(135deg, #163A24 0%, #1E4620 55%, #275A2A 100%);
+    }
+    .gold-gradient {
+      background: linear-gradient(135deg, #C59B27 0%, #E2B842 100%);
+    }
+    .keypad-btn:active {
+      transform: scale(0.95);
+    }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col max-w-2xl mx-auto shadow-xl bg-[#F3F5F2]">
+
+  <!-- TOP STICKY HEADER -->
+  <header class="clubhouse-gradient text-white sticky top-0 z-30 shadow-md px-3.5 py-2.5 no-print">
+    <div class="flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-9 h-9 rounded-xl bg-slate-950 border border-amber-400/70 flex items-center justify-center shrink-0 shadow-sm">
+          <svg class="w-6 h-6" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="WGC Black Book">
+            <rect x="6" y="4" width="24" height="28" rx="3" fill="#0A0E17" stroke="#E2B842" stroke-width="1.8"/>
+            <line x1="10.5" y1="4" x2="10.5" y2="32" stroke="#E2B842" stroke-width="1.4"/>
+            <path d="M25.5 4V11.5L23.5 9.8L21.5 11.5V4H25.5Z" fill="#E2B842"/>
+            <text x="20.5" y="21.5" text-anchor="middle" fill="#F6D365" font-family="Georgia, serif" font-weight="bold" font-size="6.8" letter-spacing="0.3">WGC</text>
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <h1 class="text-sm sm:text-base font-extrabold tracking-tight leading-tight truncate">WGC Black Book Boys</h1>
+          <p id="headerSubtext" class="text-[11px] text-emerald-200 font-medium truncate">Wed, 25 Nov 2026 • 0/16 Played</p>
+        </div>
+      </div>
+
+      <!-- Live Cloud Sync Status & Session Selector -->
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button id="syncStatusBtn" onclick="openSyncModal()" title="Multi-Phone Live Sync"
+          class="flex items-center gap-1.5 bg-white/15 hover:bg-white/25 text-white text-[11px] font-bold rounded-lg px-2 py-1.5 border border-white/25 transition">
+          <span id="syncStatusDot" class="w-2 h-2 rounded-full bg-amber-300"></span>
+          <span id="syncStatusLabel">Sync</span>
+        </button>
+
+        <select id="sessionSelect" aria-label="Select Round Date"
+          class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold rounded-lg px-2 py-1.5 border border-white/25 focus:outline-none focus:ring-2 focus:ring-amber-300 cursor-pointer max-w-[138px]">
+        </select>
+        <button onclick="openNewSessionModal()" title="Add Next Wed/Sat Round"
+          class="gold-gradient text-slate-950 font-extrabold text-xs px-2 py-1.5 rounded-lg shadow-sm active:scale-95 transition">
+          + Date
+        </button>
+      </div>
+    </div>
+
+    <!-- SEGMENTED NAVIGATION TABS -->
+    <nav class="grid grid-cols-3 gap-1.5 mt-2.5 bg-black/25 p-1 rounded-xl">
+      <button id="tabBtn-entry" onclick="switchTab('entry')"
+        class="tab-btn py-1.5 px-2 rounded-lg text-xs font-extrabold tracking-wide transition bg-white text-[#1E4620] shadow-sm">
+        1. Enter Scores
+      </button>
+      <button id="tabBtn-results" onclick="switchTab('results')"
+        class="tab-btn py-1.5 px-2 rounded-lg text-xs font-bold tracking-wide transition text-emerald-100 hover:text-white">
+        2. Black Book Page
+      </button>
+      <button id="tabBtn-season" onclick="switchTab('season')"
+        class="tab-btn py-1.5 px-2 rounded-lg text-xs font-bold tracking-wide transition text-emerald-100 hover:text-white">
+        3. Season &amp; App
+      </button>
+    </nav>
+  </header>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="flex-1 p-3 pb-24 space-y-2.5">
+
+    <!-- ========================================================= -->
+    <!-- TAB 1: ENTER SCORES (COMPACT SINGLE-SCREEN ENTRY)         -->
+    <!-- ========================================================= -->
+    <section id="view-entry" class="space-y-2">
+
+      <!-- Player Carousel & Quick-Jump Strip -->
+      <div class="bg-white rounded-2xl p-2 shadow-sm border border-emerald-900/10">
+        <div class="flex items-center justify-between mb-1 px-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Tap Golfer to Score</span>
+          <button onclick="openRosterJumpModal()"
+            class="text-[11px] font-bold text-[#1E4620] bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-200">
+            All 16 Players ▾
+          </button>
+        </div>
+        <div id="playerPillStrip" class="flex gap-1 overflow-x-auto no-scrollbar">
+        </div>
+      </div>
+
+      <!-- Active Golfer Score Card (Compact so Score + 18th Hole Y/N fit on 1 screen) -->
+      <div class="bg-white rounded-2xl p-3 shadow-sm border border-emerald-900/10 space-y-2.5">
+        <!-- Player Header -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span id="activePlayerIndexBadge" class="text-[11px] font-extrabold bg-emerald-100 text-[#1E4620] px-2 py-0.5 rounded-md">#1</span>
+              <h2 id="activePlayerName" class="text-lg font-black text-slate-900 tracking-tight leading-none">Robin</h2>
+            </div>
+            <div class="text-[11px] text-slate-500 mt-1 flex items-center gap-1.5">
+              <span>Start Extra:</span>
+              <button type="button" onclick="openQuickStartExtraModal()" title="Edit Starting Extra Balance"
+                class="inline-flex items-center gap-1 bg-emerald-50 hover:bg-emerald-100 text-[#1E4620] font-extrabold px-2 py-0.5 rounded-md border border-emerald-200 transition">
+                <strong id="activePlayerStartExtra">+2</strong>
+                <span class="text-[10px]">✏️</span>
+              </button>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-[9px] uppercase font-bold tracking-wider text-slate-400 block">Today's Total</span>
+            <span id="activePlayerCombinedPreview" class="text-xl font-black text-[#1E4620] leading-none">—</span>
+            <span id="activePlayerBreakdownPreview" class="text-[10px] font-bold text-slate-400 block mt-0.5"></span>
+          </div>
+        </div>
+
+        <!-- Step A: Score for the Day + Touch Keypad -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-[11px] font-extrabold uppercase tracking-wider text-slate-700">
+              A. Score for the Day
+            </label>
+            <button onclick="markPlayerDNP()"
+              class="text-[10px] font-bold text-rose-600 hover:bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200 transition">
+              Did Not Play / Clear
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2 mb-1.5">
+            <button type="button" onclick="adjustScore(-1)" aria-label="Decrease score by 1"
+              class="keypad-btn bg-rose-50 hover:bg-rose-100 active:bg-rose-200 text-rose-800 font-black text-base px-3.5 py-2 rounded-xl border border-rose-200 shrink-0">
+              −1
+            </button>
+            <div id="scoreDisplayBox"
+              class="flex-1 bg-slate-50 border-2 border-[#1E4620]/30 rounded-xl py-1.5 px-3 flex items-center justify-between">
+              <span class="text-[11px] font-semibold text-slate-400">Pts:</span>
+              <span id="scoreDisplayValue" class="text-2xl font-black text-slate-900 tracking-tight leading-none">—</span>
+            </div>
+            <button type="button" onclick="adjustScore(1)" aria-label="Increase score by 1"
+              class="keypad-btn bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-[#1E4620] font-black text-base px-3.5 py-2 rounded-xl border border-emerald-300 shrink-0">
+              +1
+            </button>
+          </div>
+
+          <!-- Compact 1-Tap Number Pad -->
+          <div class="grid grid-cols-6 gap-1">
+            <button type="button" onclick="appendDigit('1')" class="keypad-btn bg-slate-100 hover:bg-slate-200 text-slate-900 font-extrabold text-base py-1.5 rounded-lg">1</button>
+            <button type="button" onclick="appendDigit('2')" class="keypad-btn bg-slate-100 hover:bg-slate-200 text-slate-900 font-extrabold text-base py-1.5 rounded-lg">2</button>
+            <button type="button" onclick="appendDigit('3')" class="keypad-btn bg-slate-100 hover:bg-slate-200 text-slate-900 font-extrabold text-base py-1.5 rounded-lg">3</button>
+            <button type="button" onclick="appendDigit('4')" class="keypad-btn bg-slate-100 hover:bg-slate-200 text-slate-900 font-extrabold text-base py-1.5 rounded-lg">4</button>
+            <button type="button" onclick="appendDigit('5')" class="keypad-btn bg-slate-100 hover:bg-slate-200 text-slate-900 font-extrabold text-base py-1.5 rounded-lg">5</button>
+            <button type="button" onclick="backspaceScore()" class="keypad-btn bg-amber-100 hover:bg-amber-200 text-amber-900 font-extrabold text-xs py-1.5 rounded-lg">⌫</button>
+            <button type="button" onclick="appendDigit('6')" class="keypad-btn bg-slate-100 hover:bg-slate-200 text-slate-900 font-extrabold text-base py-1.5 rounded-lg">6</button>
+            <button type="button" onclick="appendDigit('7')" class="keypad-btn bg-slate-100 hover:bg-slate-200 text-slate-900 font-extrabold text-base py-1.5 rounded-lg">7</button>
+            <button type="button" onclick="appendDigit('8')" class="keypad-btn bg-slate-100 hover:bg-slate-200 text-slate-900 font-extrabold text-base py-1.5 rounded-lg">8</button>
+            <button type="button" onclick="appendDigit('9')" class="keypad-btn bg-slate-100 hover:bg-slate-200 text-slate-900 font-extrabold text-base py-1.5 rounded-lg">9</button>
+            <button type="button" onclick="appendDigit('0')" class="keypad-btn bg-slate-100 hover:bg-slate-200 text-slate-900 font-extrabold text-base py-1.5 rounded-lg">0</button>
+            <button type="button" onclick="clearScore()" class="keypad-btn bg-rose-100 hover:bg-rose-200 text-rose-900 font-extrabold text-xs py-1.5 rounded-lg">CLR</button>
+          </div>
+        </div>
+
+        <!-- Step B: Scored on the 18th Hole? -->
+        <div class="pt-1.5 border-t border-slate-100">
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-[11px] font-extrabold uppercase tracking-wider text-slate-800">
+              B. Scored on the 18th Hole?
+            </label>
+            <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+              Yes = +1 Carried Forward
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" id="btn18Yes" onclick="setScoredOn18(true)"
+              class="py-2 px-3 rounded-xl font-black text-xs border-2 transition flex items-center justify-center gap-1.5 border-slate-200 bg-slate-50 text-slate-600">
+              <span>YES (Y)</span>
+              <span class="text-[10px] font-bold opacity-80">+1 Carry Fwd</span>
+            </button>
+            <button type="button" id="btn18No" onclick="setScoredOn18(false)"
+              class="py-2 px-3 rounded-xl font-black text-xs border-2 transition flex items-center justify-center gap-1.5 border-slate-200 bg-slate-50 text-slate-600">
+              <span>NO (N)</span>
+              <span class="text-[10px] font-bold opacity-80">0 Extra</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Next / Previous Player Navigation -->
+        <div class="flex items-center gap-2 pt-0.5">
+          <button type="button" onclick="prevPlayer()"
+            class="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs transition">
+            ← Prev
+          </button>
+          <button type="button" onclick="nextPlayer()"
+            class="flex-1 py-2.5 px-4 rounded-xl clubhouse-gradient text-white font-extrabold text-xs shadow-md active:scale-[0.99] transition flex items-center justify-center gap-2">
+            <span>Next Player →</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Leader / Tie Declaration Banner (Placed below entry card so no scrolling needed) -->
+      <div id="entryBannerContainer"></div>
+
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- TAB 2: BLACK BOOK PAGE (RESULTS, PAYOUTS & CARRY FORWARD) -->
+    <!-- ========================================================= -->
+    <section id="view-results" class="hidden space-y-3">
+
+      <!-- Winner / Tie & Prize Pot Hero Card -->
+      <div id="resultsHeroCard"></div>
+
+      <!-- Quick KPI Summary Strip -->
+      <div class="grid grid-cols-3 gap-2">
+        <div class="bg-white rounded-xl p-2.5 border border-emerald-900/10 text-center shadow-xs">
+          <span class="text-[10px] font-bold uppercase text-slate-400 block">Players Today</span>
+          <span id="kpiPlayed" class="text-lg font-black text-slate-900">0/16</span>
+        </div>
+        <div class="bg-white rounded-xl p-2.5 border border-emerald-900/10 text-center shadow-xs">
+          <span class="text-[10px] font-bold uppercase text-slate-400 block">Prize Pot (£2)</span>
+          <span id="kpiPot" class="text-lg font-black text-[#1E4620]">£0</span>
+        </div>
+        <div class="bg-white rounded-xl p-2.5 border border-emerald-900/10 text-center shadow-xs">
+          <span class="text-[10px] font-bold uppercase text-slate-400 block">Top Total</span>
+          <span id="kpiTopScore" class="text-lg font-black text-amber-600">—</span>
+        </div>
+      </div>
+
+      <!-- Share / Copy WhatsApp Summary Button -->
+      <div class="flex gap-2 no-print">
+        <button onclick="copyWhatsAppSummary()"
+          class="flex-1 py-2.5 px-3 rounded-xl bg-[#1E4620] hover:bg-[#163A24] text-white font-extrabold text-xs shadow-sm flex items-center justify-center gap-2 transition">
+          <span>📋 Copy Black Book Page for WhatsApp</span>
+        </button>
+        <button onclick="createNextScheduledSession()"
+          class="py-2.5 px-3 rounded-xl gold-gradient text-slate-950 font-extrabold text-xs shadow-sm transition">
+          Next Round →
+        </button>
+      </div>
+
+      <!-- Full Black Book Ledger Table -->
+      <div class="bg-white rounded-2xl shadow-sm border border-emerald-900/10 overflow-hidden">
+        <div class="px-3.5 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+          <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Black Book Ledger</h3>
+          <span class="text-[10px] font-bold text-slate-500">Tap row to edit</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 text-[10px] font-extrabold uppercase text-slate-500 bg-slate-50/60">
+                <th class="py-2 pl-3 pr-1">Pos</th>
+                <th class="py-2 px-1.5">Golfer</th>
+                <th class="py-2 px-1 text-center">Start</th>
+                <th class="py-2 px-1 text-center">Score</th>
+                <th class="py-2 px-1 text-center">Total</th>
+                <th class="py-2 px-1 text-center">18th</th>
+                <th class="py-2 px-1 text-center">Cut</th>
+                <th class="py-2 pl-1 pr-3 text-right">Carry Fwd</th>
+              </tr>
+            </thead>
+            <tbody id="resultsTableBody" class="divide-y divide-slate-100 text-xs">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Rule Explanation Footnote -->
+      <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3 text-[11px] text-emerald-950 space-y-1">
+        <p class="font-extrabold">Black Book Accumulated Extras Rules:</p>
+        <ul class="list-disc pl-4 space-y-0.5 text-emerald-900">
+          <li><strong>Today's Total:</strong> <code>Starting Extra + Score for the Day</code> (e.g. <code>+2 + 26 = 28</code>).</li>
+          <li><strong>18th Hole Rule:</strong> Answering <strong>YES</strong> adds <strong>+1</strong> to the carried-forward balance.</li>
+          <li><strong>Outright Winner's Cut:</strong> <code>1 + (Total − 36, if &gt;36) + (Margin over 2nd)</code> subtracted from carried-forward balance.</li>
+          <li><strong>Tie Rule:</strong> If 2 or more tie for 1st, there is no winner, no cut for tied players, and all £2 entries are returned.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- TAB 3: SEASON HISTORY, ROSTER & PHONE INSTALL GUIDE       -->
+    <!-- ========================================================= -->
+    <section id="view-season" class="hidden space-y-3">
+
+      <!-- Multi-Phone Cloud Sync Banner -->
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-emerald-900/10 space-y-2">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-black text-slate-900">Multi-Phone Live Sync</h2>
+            <p id="seasonSyncSummary" class="text-xs text-slate-500">Sync scores live across committee members' phones.</p>
+          </div>
+          <button onclick="openSyncModal()"
+            class="py-2 px-3 rounded-xl clubhouse-gradient text-white font-extrabold text-xs shadow-sm transition">
+            Configure Sync
+          </button>
+        </div>
+      </div>
+
+      <!-- Roster & Export Actions -->
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-emerald-900/10 space-y-2.5">
+        <div>
+          <h2 class="text-sm font-black text-slate-900">League Roster &amp; Starting Extras</h2>
+          <p class="text-xs text-slate-500">Edit golfers, set starting extra balances, or export/restore backups.</p>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="openRosterModal()"
+            class="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#1E4620] font-extrabold text-xs border border-emerald-200 transition">
+            ✏️ Edit Names &amp; Start Extras
+          </button>
+          <button onclick="exportToCSV()"
+            class="py-2.5 px-3 rounded-xl clubhouse-gradient text-white font-extrabold text-xs shadow-sm transition">
+            📥 Export CSV / Excel
+          </button>
+          <button onclick="exportJSONBackup()"
+            class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition">
+            💾 Download Backup File
+          </button>
+          <label class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs text-center cursor-pointer transition">
+            📤 Restore Backup
+            <input type="file" accept=".json" onchange="importJSONBackup(event)" class="hidden" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Season Rounds History -->
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-emerald-900/10 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-black text-slate-900">Played &amp; Scheduled Rounds</h2>
+            <p class="text-xs text-slate-500">Wednesdays &amp; Saturdays from 25 Nov 2026</p>
+          </div>
+          <button onclick="openNewSessionModal()"
+            class="text-xs font-extrabold bg-emerald-50 text-[#1E4620] px-2.5 py-1.5 rounded-lg border border-emerald-200">
+            + Add Round
+          </button>
+        </div>
+        <div id="seasonHistoryList" class="space-y-2">
+        </div>
+      </div>
+
+      <!-- How to Save on iPhone & Android Home Screen -->
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-emerald-900/10 space-y-2">
+        <h2 class="text-sm font-black text-slate-900">📲 Save as an App on Your Phone</h2>
+        <p class="text-xs text-slate-600 leading-relaxed">
+          All scores save automatically on your phone—even offline on the golf course. To put an icon on your phone's Home Screen:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+            <p class="font-extrabold text-slate-900 mb-1">🍎 iPhone (Safari)</p>
+            <p class="text-slate-600">Tap the <strong>Share</strong> icon (square with upward arrow) at the bottom, then tap <strong>"Add to Home Screen"</strong>.</p>
+          </div>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+            <p class="font-extrabold text-slate-900 mb-1">🤖 Android (Chrome)</p>
+            <p class="text-slate-600">Tap the <strong>⋮ Menu</strong> in the top-right corner, then tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong>.</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 1: ALL PLAYERS QUICK-JUMP DRAWER                    -->
+  <!-- ========================================================= -->
+  <div id="rosterJumpModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-3">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
+      <div class="px-4 py-3 clubhouse-gradient text-white flex items-center justify-between">
+        <span class="font-extrabold text-sm">Select Golfer to Score</span>
+        <button onclick="closeModal('rosterJumpModal')" class="text-white/80 hover:text-white font-black text-lg px-2">✕</button>
+      </div>
+      <div id="rosterJumpGrid" class="p-3 grid grid-cols-2 gap-2 overflow-y-auto">
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 2: ADD NEW WEDNESDAY / SATURDAY ROUND               -->
+  <!-- ========================================================= -->
+  <div id="newSessionModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-center justify-center p-3">
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden">
+      <div class="px-4 py-3 clubhouse-gradient text-white flex items-center justify-between">
+        <span class="font-extrabold text-sm">Add Golf Round Date</span>
+        <button onclick="closeModal('newSessionModal')" class="text-white/80 hover:text-white font-black text-lg px-2">✕</button>
+      </div>
+      <div class="p-4 space-y-3">
+        <div>
+          <label class="block text-xs font-extrabold text-slate-700 mb-1">Quick Select Next Wed / Sat:</label>
+          <button type="button" onclick="createNextScheduledSession(); closeModal('newSessionModal')"
+            class="w-full py-2.5 px-3 rounded-xl gold-gradient text-slate-950 font-extrabold text-xs shadow-sm">
+            ⚡ Add Next Scheduled Round (<span id="suggestedNextDateLabel">Sat, 28 Nov 2026</span>)
+          </button>
+        </div>
+        <div class="border-t border-slate-100 pt-3">
+          <label for="customSessionDate" class="block text-xs font-extrabold text-slate-700 mb-1">Or Pick Any Specific Date:</label>
+          <input type="date" id="customSessionDate"
+            class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold text-slate-900" />
+          <button type="button" onclick="createCustomSession()"
+            class="w-full mt-2 py-2.5 px-3 rounded-xl bg-slate-900 text-white font-extrabold text-xs">
+            Create Round on Selected Date
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 3: EDIT PLAYERS ROSTER & STARTING EXTRAS            -->
+  <!-- ========================================================= -->
+  <div id="rosterModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-3">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden max-h-[88vh] flex flex-col">
+      <div class="px-4 py-3 clubhouse-gradient text-white flex items-center justify-between">
+        <div>
+          <div class="font-extrabold text-sm">Edit Golfers &amp; Starting Extra Points</div>
+          <div class="text-[11px] text-emerald-100">Set Session 1 starting balance (+ or −) for each player</div>
+        </div>
+        <button onclick="closeModal('rosterModal')" class="text-white/80 hover:text-white font-black text-lg px-2">✕</button>
+      </div>
+      <div id="rosterEditFormList" class="p-3 overflow-y-auto space-y-2 flex-1">
+      </div>
+      <div class="p-3 border-t border-slate-100 bg-slate-50 flex flex-wrap gap-2">
+        <button type="button" onclick="addNewPlayerRow()"
+          class="py-2.5 px-3 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-[#1E4620] font-extrabold text-xs border border-emerald-300">
+          + Add Golfer
+        </button>
+        <button onclick="closeModal('rosterModal')"
+          class="flex-1 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-xs">
+          Cancel
+        </button>
+        <button onclick="saveRosterChanges()"
+          class="flex-1 py-2.5 rounded-xl clubhouse-gradient text-white font-extrabold text-xs shadow-sm">
+          Save Roster
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 4: MULTI-PHONE LIVE CLOUD SYNC (GROUP CODE)         -->
+  <!-- ========================================================= -->
+  <div id="syncModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-center justify-center p-3">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+      <div class="px-4 py-3 clubhouse-gradient text-white flex items-center justify-between">
+        <div>
+          <div class="font-extrabold text-sm">Live Multi-Phone Sync (Extras App)</div>
+          <div class="text-[11px] text-emerald-100">Share a Group Code with your committee members</div>
+        </div>
+        <button onclick="closeModal('syncModal')" class="text-white/80 hover:text-white font-black text-lg px-2">✕</button>
+      </div>
+      <div class="p-4 space-y-3">
+        <div id="syncModalStatusBox" class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700">
+          Enter a shared <strong>Group Code</strong> (for example: <code>WGC2026</code>) on your phone and on your committee members' phones so scores stay updated in real time.
+        </div>
+
+        <div>
+          <label for="groupCodeInput" class="block text-xs font-extrabold text-slate-700 mb-1">Society Group Code:</label>
+          <input type="text" id="groupCodeInput" placeholder="e.g. WGC2026" maxlength="24"
+            class="w-full border-2 border-slate-300 focus:border-[#1E4620] rounded-xl px-3 py-2.5 text-sm font-black uppercase tracking-wider text-slate-900" />
+        </div>
+
+        <div class="flex gap-2">
+          <button type="button" onclick="connectGroupSync()"
+            class="flex-1 py-2.5 px-3 rounded-xl clubhouse-gradient text-white font-extrabold text-xs shadow-sm">
+            Connect &amp; Sync
+          </button>
+          <button type="button" onclick="disconnectGroupSync()"
+            class="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs">
+            Offline Only
+          </button>
+        </div>
+
+        <p class="text-[11px] text-slate-500 leading-relaxed">
+          Even when synced, a full copy stays saved on each phone so it never loses scores if clubhouse Wi-Fi or mobile signal drops.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 5: QUICK EDIT SINGLE PLAYER START EXTRA BALANCE     -->
+  <!-- ========================================================= -->
+  <div id="quickStartExtraModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-center justify-center p-3">
+    <div class="bg-white w-full max-w-xs rounded-2xl shadow-2xl overflow-hidden">
+      <div class="px-4 py-3 clubhouse-gradient text-white flex items-center justify-between">
+        <div>
+          <div class="font-extrabold text-sm">Edit Starting Extra</div>
+          <div id="quickStartExtraPlayerLabel" class="text-[11px] text-emerald-100">Robin</div>
+        </div>
+        <button onclick="closeModal('quickStartExtraModal')" class="text-white/80 hover:text-white font-black text-lg px-2">✕</button>
+      </div>
+      <div class="p-4 space-y-3">
+        <p class="text-[11px] text-slate-600">Set the accumulated extra points carried into Session 1 (use <code>-</code> for negative balances):</p>
+        <div class="flex items-center justify-center gap-2">
+          <button type="button" onclick="nudgeQuickStartExtra(-1)"
+            class="w-11 h-11 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 font-black text-lg border border-rose-200">
+            −1
+          </button>
+          <input type="number" step="1" id="quickStartExtraInput"
+            class="w-24 text-center border-2 border-[#1E4620]/40 focus:border-[#1E4620] rounded-xl py-2 text-xl font-black text-slate-900" />
+          <button type="button" onclick="nudgeQuickStartExtra(1)"
+            class="w-11 h-11 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#1E4620] font-black text-lg border border-emerald-300">
+            +1
+          </button>
+        </div>
+        <div class="flex gap-2 pt-1">
+          <button type="button" onclick="closeModal('quickStartExtraModal')"
+            class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs">
+            Cancel
+          </button>
+          <button type="button" onclick="saveQuickStartExtra()"
+            class="flex-1 py-2.5 rounded-xl clubhouse-gradient text-white font-extrabold text-xs shadow-sm">
+            Save Start
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastBanner"
+    class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-200">
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. STATE INITIALIZATION & PERSISTENCE (SEPARATE STORAGE FOR EXTRAS APP)
+    // =========================================================================
+    const STORAGE_KEY = 'wgc_black_book_extras_v1';
+    const GROUP_CODE_KEY = 'wgc_black_book_extras_group_v1';
+
+    // Exact 16-player roster & starting accumulated extras from the 25th Nov Black Book page
+    const DEFAULT_ROSTER = [
+      { name: 'Robin', initialExtra: 2 },
+      { name: 'Steve', initialExtra: -1 },
+      { name: 'Dave', initialExtra: 2 },
+      { name: 'Kev', initialExtra: 3 },
+      { name: 'Al', initialExtra: 4 },
+      { name: 'Roy', initialExtra: 3 },
+      { name: 'Liam', initialExtra: 1 },
+      { name: 'Bob', initialExtra: 1 },
+      { name: 'Mike', initialExtra: 1 },
+      { name: 'Chris', initialExtra: 3 },
+      { name: 'Neil', initialExtra: 0 },
+      { name: 'Richard', initialExtra: 0 },
+      { name: 'Alan', initialExtra: 0 },
+      { name: 'Martin', initialExtra: -4 },
+      { name: 'Les', initialExtra: 3 },
+      { name: 'Harvey', initialExtra: 2 }
+    ];
+
+    function createDefaultPlayers() {
+      return DEFAULT_ROSTER.map((item, i) => ({
+        id: `p_${i + 1}`,
+        name: item.name,
+        initialExtra: item.initialExtra
+      }));
+    }
+
+    function migrateStartExtrasIfAllZero(loadedState) {
+      if (!loadedState || !Array.isArray(loadedState.players)) return loadedState;
+      const allZero = loadedState.players.length === DEFAULT_ROSTER.length &&
+        loadedState.players.every((p, idx) => (Number(p.initialExtra) || 0) === 0 && p.name === DEFAULT_ROSTER[idx].name);
+      if (allZero) {
+        loadedState.players = loadedState.players.map((p, idx) => ({
+          ...p,
+          initialExtra: DEFAULT_ROSTER[idx].initialExtra
+        }));
+      }
+      return loadedState;
+    }
+
+    function formatSignedNumber(val) {
+      const n = Number(val) || 0;
+      if (n > 0) return `+${n}`;
+      return `${n}`;
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.players) && Array.isArray(parsed.sessions) && parsed.sessions.length > 0) {
+            return migrateStartExtrasIfAllZero(parsed);
+          }
+        }
+      } catch (e) {
+        console.warn('Could not load saved state:', e);
+      }
+
+      const firstSessionId = 'sess_2026_11_25';
+      return {
+        players: createDefaultPlayers(),
+        sessions: [
+          {
+            id: firstSessionId,
+            date: '2026-11-25',
+            entries: {}
+          }
+        ],
+        activeSessionId: firstSessionId,
+        activePlayerIndex: 0,
+        activeTab: 'entry'
+      };
+    }
+
+    let state = loadState();
+
+    function saveState(skipCloudPush = false) {
+      try {
+        state.updatedAt = Date.now();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn('Could not save state:', e);
+      }
+      if (!skipCloudPush && typeof window.pushStateToCloud === 'function') {
+        window.pushStateToCloud(state);
+      }
+    }
+
+    // =========================================================================
+    // 2. DATE HELPERS (WEDNESDAYS & SATURDAYS STARTING WED 25 NOV 2026)
+    // =========================================================================
+    function parseISODate(isoStr) {
+      const [y, m, d] = isoStr.split('-').map(Number);
+      return new Date(Date.UTC(y, m - 1, d));
+    }
+
+    function formatISODate(dateObj) {
+      const y = dateObj.getUTCFullYear();
+      const m = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getUTCDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatFriendlyDate(isoStr) {
+      const dt = parseISODate(isoStr);
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return `${days[dt.getUTCDay()]}, ${dt.getUTCDate()} ${months[dt.getUTCMonth()]} ${dt.getUTCFullYear()}`;
+    }
+
+    function getNextWedOrSat(latestIsoStr) {
+      const dt = parseISODate(latestIsoStr);
+      for (let i = 1; i <= 7; i++) {
+        const candidate = new Date(dt.getTime() + i * 86400000);
+        const dow = candidate.getUTCDay();
+        if (dow === 3 || dow === 6) {
+          return formatISODate(candidate);
+        }
+      }
+      return formatISODate(new Date(dt.getTime() + 3 * 86400000));
+    }
+
+    function getSortedSessions() {
+      return [...state.sessions].sort((a, b) => a.date.localeCompare(b.date));
+    }
+
+    function getActiveSession() {
+      return state.sessions.find(s => s.id === state.activeSessionId) || getSortedSessions()[0];
+    }
+
+    // =========================================================================
+    // 3. CORE ACCUMULATED EXTRAS, TIE & PAYOUT ENGINE
+    // =========================================================================
+    function computeAllSessions() {
+      const orderedSessions = getSortedSessions();
+      const runningExtra = {};
+      state.players.forEach(p => {
+        runningExtra[p.id] = Number(p.initialExtra) || 0;
+      });
+
+      const computedMap = {};
+
+      orderedSessions.forEach(session => {
+        const rows = state.players.map(p => {
+          const startExtra = runningExtra[p.id];
+          const entry = session.entries[p.id] || { played: false, points: null, scored18: false };
+          const hasValidPoints = entry.played && entry.points !== null && entry.points !== '' && !Number.isNaN(Number(entry.points));
+          const points = hasValidPoints ? Number(entry.points) : null;
+          const scored18 = hasValidPoints ? Boolean(entry.scored18) : false;
+          // Total for the day = Starting Accumulated Extra + Today's Score
+          const combined = hasValidPoints ? (startExtra + points) : null;
+
+          return {
+            playerId: p.id,
+            name: p.name,
+            startExtra,
+            played: hasValidPoints,
+            points,
+            combined,
+            scored18,
+            extraAdd18: 0,
+            winnerCut: 0,
+            carryForward: startExtra,
+            isWinner: false,
+            isTiedFirst: false,
+            rank: null
+          };
+        });
+
+        const activeRows = rows.filter(r => r.played);
+        const playersCount = activeRows.length;
+        const prizePot = playersCount * 2; // £2 per playing golfer
+
+        // Sort active players descending by Today's Total (Start Extra + Today's Score)
+        const rankedActive = [...activeRows].sort((a, b) => {
+          if (b.combined !== a.combined) return b.combined - a.combined;
+          return a.startExtra - b.startExtra;
+        });
+
+        let topScore = null;
+        let secondScore = null;
+        let topScorers = [];
+        let isTie = false;
+        let winnerRow = null;
+
+        if (rankedActive.length > 0) {
+          topScore = rankedActive[0].combined;
+          topScorers = rankedActive.filter(r => r.combined === topScore);
+          isTie = topScorers.length > 1;
+
+          if (!isTie) {
+            winnerRow = topScorers[0];
+            winnerRow.isWinner = true;
+            secondScore = rankedActive.length > 1 ? rankedActive[1].combined : topScore;
+          } else {
+            topScorers.forEach(r => { r.isTiedFirst = true; });
+          }
+
+          rankedActive.forEach((r, idx) => {
+            if (idx === 0) {
+              r.rank = 1;
+            } else if (r.combined === rankedActive[idx - 1].combined) {
+              r.rank = rankedActive[idx - 1].rank;
+            } else {
+              r.rank = idx + 1;
+            }
+          });
+        }
+
+        // Calculate New Accumulated Extra Carried Forward for Next Round
+        rows.forEach(r => {
+          if (!r.played) {
+            r.carryForward = r.startExtra;
+            return;
+          }
+
+          // +1 carried forward if player scored on the 18th hole
+          r.extraAdd18 = r.scored18 ? 1 : 0;
+
+          // Outright Winner's Cut (only if there is NO tie for 1st)
+          if (r.isWinner && !isTie) {
+            const over36 = Math.max(0, r.combined - 36);
+            const margin = Math.max(0, r.combined - secondScore);
+            r.winnerCut = 1 + over36 + margin;
+          } else {
+            r.winnerCut = 0;
+          }
+
+          r.carryForward = r.startExtra + r.extraAdd18 - r.winnerCut;
+          runningExtra[r.playerId] = r.carryForward;
+        });
+
+        computedMap[session.id] = {
+          sessionId: session.id,
+          date: session.date,
+          rows,
+          rankedActive,
+          playersCount,
+          prizePot,
+          topScore,
+          secondScore,
+          topScorers,
+          isTie,
+          winnerRow
+        };
+      });
+
+      return { orderedSessions, computedMap, latestExtra: runningExtra };
+    }
+
+    // =========================================================================
+    // 4. KEYPAD & SCORE ENTRY INTERACTIONS
+    // =========================================================================
+    let rawInputBuffer = '';
+
+    function syncInputBufferFromCurrentPlayer() {
+      const session = getActiveSession();
+      const player = state.players[state.activePlayerIndex];
+      const entry = session.entries[player.id];
+      if (entry && entry.played && entry.points !== null && entry.points !== undefined) {
+        rawInputBuffer = String(entry.points);
+      } else {
+        rawInputBuffer = '';
+      }
+    }
+
+    function commitEntry(pointsVal, scored18Val) {
+      const session = getActiveSession();
+      const player = state.players[state.activePlayerIndex];
+      const existing = session.entries[player.id] || { played: false, points: null, scored18: false };
+
+      if (pointsVal === null || pointsVal === '') {
+        session.entries[player.id] = {
+          played: false,
+          points: null,
+          scored18: false
+        };
+      } else {
+        session.entries[player.id] = {
+          played: true,
+          points: Number(pointsVal),
+          scored18: scored18Val !== undefined ? Boolean(scored18Val) : Boolean(existing.scored18)
+        };
+      }
+      saveState();
+      renderAll();
+    }
+
+    function appendDigit(digit) {
+      if (rawInputBuffer.length >= 2) {
+        rawInputBuffer = digit;
+      } else {
+        rawInputBuffer = (rawInputBuffer === '0') ? digit : (rawInputBuffer + digit);
+      }
+      commitEntry(Number(rawInputBuffer));
+    }
+
+    function adjustScore(delta) {
+      const session = getActiveSession();
+      const player = state.players[state.activePlayerIndex];
+      const existing = session.entries[player.id];
+      const currentPts = (existing && existing.played && existing.points !== null && existing.points !== undefined)
+        ? Number(existing.points)
+        : (rawInputBuffer !== '' ? Number(rawInputBuffer) : 0);
+      const nextPts = Math.max(0, Math.min(99, currentPts + delta));
+      rawInputBuffer = String(nextPts);
+      commitEntry(nextPts);
+    }
+
+    function backspaceScore() {
+      if (rawInputBuffer.length <= 1) {
+        rawInputBuffer = '';
+        commitEntry(null);
+      } else {
+        rawInputBuffer = rawInputBuffer.slice(0, -1);
+        commitEntry(Number(rawInputBuffer));
+      }
+    }
+
+    function clearScore() {
+      rawInputBuffer = '';
+      commitEntry(null);
+    }
+
+    function markPlayerDNP() {
+      rawInputBuffer = '';
+      commitEntry(null);
+      showToast('Marked as Did Not Play');
+    }
+
+    function setScoredOn18(val) {
+      const session = getActiveSession();
+      const player = state.players[state.activePlayerIndex];
+      const existing = session.entries[player.id] || { played: false, points: null, scored18: false };
+
+      if (!existing.played || existing.points === null) {
+        showToast('Enter score for the day first');
+        return;
+      }
+      commitEntry(existing.points, val);
+    }
+
+    function selectPlayer(idx) {
+      state.activePlayerIndex = idx;
+      syncInputBufferFromCurrentPlayer();
+      saveState();
+      renderAll();
+      scrollActivePillIntoView();
+    }
+
+    function nextPlayer() {
+      if (state.activePlayerIndex < state.players.length - 1) {
+        selectPlayer(state.activePlayerIndex + 1);
+      } else {
+        switchTab('results');
+        showToast(`All ${state.players.length} golfers reviewed!`);
+      }
+    }
+
+    function prevPlayer() {
+      if (state.activePlayerIndex > 0) {
+        selectPlayer(state.activePlayerIndex - 1);
+      } else {
+        selectPlayer(state.players.length - 1);
+      }
+    }
+
+    function scrollActivePillIntoView() {
+      const activePill = document.getElementById(`pill_${state.activePlayerIndex}`);
+      if (activePill) {
+        activePill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+
+    // =========================================================================
+    // 5. SESSION MANAGEMENT & TAB NAVIGATION
+    // =========================================================================
+    function switchTab(tabName) {
+      state.activeTab = tabName;
+      ['entry', 'results', 'season'].forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tabBtn-${t}`);
+        if (t === tabName) {
+          view.classList.remove('hidden');
+          btn.className = 'tab-btn py-1.5 px-2 rounded-lg text-xs font-extrabold tracking-wide transition bg-white text-[#1E4620] shadow-sm';
+        } else {
+          view.classList.add('hidden');
+          btn.className = 'tab-btn py-1.5 px-2 rounded-lg text-xs font-bold tracking-wide transition text-emerald-100 hover:text-white';
+        }
+      });
+      saveState();
+      renderAll();
+    }
+
+    function changeActiveSession(sessionId) {
+      state.activeSessionId = sessionId;
+      syncInputBufferFromCurrentPlayer();
+      saveState();
+      renderAll();
+    }
+
+    function createNextScheduledSession() {
+      const ordered = getSortedSessions();
+      const latestDate = ordered[ordered.length - 1].date;
+      const nextDate = getNextWedOrSat(latestDate);
+      addOrSwitchSessionByDate(nextDate);
+    }
+
+    function createCustomSession() {
+      const val = document.getElementById('customSessionDate').value;
+      if (!val) {
+        showToast('Please select a date');
+        return;
+      }
+      addOrSwitchSessionByDate(val);
+      closeModal('newSessionModal');
+    }
+
+    function addOrSwitchSessionByDate(isoDate) {
+      const existing = state.sessions.find(s => s.date === isoDate);
+      if (existing) {
+        state.activeSessionId = existing.id;
+        syncInputBufferFromCurrentPlayer();
+        saveState();
+        renderAll();
+        showToast(`Switched to ${formatFriendlyDate(isoDate)}`);
+        return;
+      }
+
+      const newId = 'sess_' + isoDate.replace(/-/g, '_');
+      state.sessions.push({
+        id: newId,
+        date: isoDate,
+        entries: {}
+      });
+      state.activeSessionId = newId;
+      state.activePlayerIndex = 0;
+      syncInputBufferFromCurrentPlayer();
+      saveState();
+      switchTab('entry');
+      showToast(`Created round: ${formatFriendlyDate(isoDate)}`);
+    }
+
+    function deleteSession(sessionId) {
+      if (state.sessions.length <= 1) {
+        showToast('Cannot delete the only round');
+        return;
+      }
+      state.sessions = state.sessions.filter(s => s.id !== sessionId);
+      if (state.activeSessionId === sessionId) {
+        const remaining = getSortedSessions();
+        state.activeSessionId = remaining[remaining.length - 1].id;
+      }
+      syncInputBufferFromCurrentPlayer();
+      saveState();
+      renderAll();
+      showToast('Round removed');
+    }
+
+    // =========================================================================
+    // 6. ROSTER EDITOR & CSV / EXCEL EXPORT
+    // =========================================================================
+    let draftRoster = [];
+
+    function openRosterModal() {
+      draftRoster = state.players.map(p => ({ ...p }));
+      renderRosterEditForm();
+      document.getElementById('rosterModal').classList.remove('hidden');
+    }
+
+    function renderRosterEditForm() {
+      const list = document.getElementById('rosterEditFormList');
+      list.innerHTML = draftRoster.map((p, idx) => `
+        <div class="flex items-center gap-1.5 bg-slate-50 p-2 rounded-xl border border-slate-200">
+          <span class="text-xs font-black text-slate-400 w-5 text-center">${idx + 1}.</span>
+          <input type="text" id="editPlayerName_${idx}" value="${escapeHtml(p.name)}"
+            oninput="draftRoster[${idx}].name = this.value"
+            class="flex-1 min-w-0 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-900" />
+          <div class="flex items-center gap-1 shrink-0">
+            <span class="text-[10px] font-bold text-slate-500 uppercase">Start</span>
+            <input type="number" step="1" id="editPlayerExtra_${idx}" value="${p.initialExtra}"
+              oninput="draftRoster[${idx}].initialExtra = Number(this.value)"
+              class="w-14 bg-white border border-slate-300 rounded-lg px-1.5 py-1.5 text-xs font-black text-center text-[#1E4620]" />
+          </div>
+          ${draftRoster.length > 2 ? `
+            <button type="button" onclick="removeDraftPlayer(${idx})" title="Remove golfer"
+              class="w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 font-black text-xs border border-rose-200 shrink-0">
+              ✕
+            </button>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    function addNewPlayerRow() {
+      const nextNum = draftRoster.length + 1;
+      draftRoster.push({
+        id: `p_${Date.now().toString(36)}_${nextNum}`,
+        name: `New Golfer ${nextNum}`,
+        initialExtra: 0
+      });
+      renderRosterEditForm();
+      const list = document.getElementById('rosterEditFormList');
+      if (list) list.scrollTop = list.scrollHeight;
+    }
+
+    function removeDraftPlayer(idx) {
+      if (draftRoster.length <= 2) return;
+      draftRoster.splice(idx, 1);
+      renderRosterEditForm();
+    }
+
+    function saveRosterChanges() {
+      state.players = draftRoster.map((p, idx) => ({
+        id: p.id,
+        name: (p.name || '').trim() || `Player ${idx + 1}`,
+        initialExtra: !Number.isNaN(Number(p.initialExtra)) ? Number(p.initialExtra) : 0
+      }));
+      if (state.activePlayerIndex >= state.players.length) {
+        state.activePlayerIndex = 0;
+      }
+      saveState();
+      closeModal('rosterModal');
+      renderAll();
+      showToast('Roster & starting extra balances updated!');
+    }
+
+    function openQuickStartExtraModal() {
+      const player = state.players[state.activePlayerIndex];
+      if (!player) return;
+      document.getElementById('quickStartExtraPlayerLabel').textContent = `${player.name} (Session 1 Start Balance)`;
+      document.getElementById('quickStartExtraInput').value = Number(player.initialExtra) || 0;
+      document.getElementById('quickStartExtraModal').classList.remove('hidden');
+    }
+
+    function nudgeQuickStartExtra(delta) {
+      const input = document.getElementById('quickStartExtraInput');
+      const current = Number(input.value) || 0;
+      input.value = current + delta;
+    }
+
+    function saveQuickStartExtra() {
+      const player = state.players[state.activePlayerIndex];
+      if (!player) return;
+      const val = Number(document.getElementById('quickStartExtraInput').value);
+      player.initialExtra = !Number.isNaN(val) ? val : 0;
+      saveState();
+      closeModal('quickStartExtraModal');
+      renderAll();
+      showToast(`${player.name} starting extra set to ${formatSignedNumber(player.initialExtra)}`);
+    }
+
+    function exportToCSV() {
+      const { orderedSessions, computedMap } = computeAllSessions();
+      const headers = ['Date', 'Day', 'Golfer', 'Starting Extra', 'Score for Day', 'Total (Start + Score)', 'Scored on 18th', '18th Carry Fwd Adj', 'Winner Cut', 'New Carry Forward', 'Result', 'Prize Payout (£)'];
+      const lines = [headers.join(',')];
+
+      orderedSessions.forEach(sess => {
+        const comp = computedMap[sess.id];
+        const friendly = formatFriendlyDate(sess.date);
+        const dayName = friendly.split(',')[0];
+        comp.rows.forEach(r => {
+          let resultLabel = 'Did Not Play';
+          let payout = 0;
+          if (r.played) {
+            if (r.isWinner) {
+              resultLabel = 'WINNER';
+              payout = comp.prizePot;
+            } else if (r.isTiedFirst) {
+              resultLabel = 'TIE FOR 1ST (Money Returned)';
+              payout = 0;
+            } else {
+              resultLabel = `Pos ${r.rank}`;
+            }
+          }
+          lines.push([
+            sess.date,
+            dayName,
+            `"${r.name.replace(/"/g, '""')}"`,
+            formatSignedNumber(r.startExtra),
+            r.played ? r.points : '',
+            r.played ? r.combined : '',
+            r.played ? (r.scored18 ? 'Yes' : 'No') : '',
+            r.played ? (r.extraAdd18 ? '+1' : '0') : '',
+            r.played ? (r.winnerCut ? `-${r.winnerCut}` : '0') : '',
+            formatSignedNumber(r.carryForward),
+            `"${resultLabel}"`,
+            payout
+          ].join(','));
+        });
+      });
+
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `WGC_Black_Book_Extras_${getActiveSession().date}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('CSV exported for Excel / Numbers!');
+    }
+
+    function exportJSONBackup() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `WGC_Black_Book_Extras_Backup_${getActiveSession().date}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Backup file downloaded!');
+    }
+
+    function importJSONBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (imported && Array.isArray(imported.players) && Array.isArray(imported.sessions)) {
+            state = imported;
+            syncInputBufferFromCurrentPlayer();
+            saveState();
+            renderAll();
+            showToast('Backup restored successfully!');
+          } else {
+            showToast('Invalid backup file');
+          }
+        } catch (err) {
+          showToast('Could not read backup file');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function buildRoundSummaryText() {
+      const { computedMap } = computeAllSessions();
+      const sess = getActiveSession();
+      const comp = computedMap[sess.id];
+      const lines = [];
+      lines.push(`📓 *WGC Black Book Boys — ${formatFriendlyDate(sess.date)}*`);
+      lines.push(`Players: ${comp.playersCount}/${state.players.length} | Prize Pot: £${comp.prizePot}`);
+      lines.push('');
+
+      if (comp.playersCount === 0) {
+        lines.push('No scores entered yet.');
+      } else if (comp.isTie) {
+        const tiedNames = comp.topScorers.map(t => t.name).join(' & ');
+        lines.push(`🤝 *TIE FOR 1ST (${comp.topScore} pts):* ${tiedNames}`);
+        lines.push(`💷 *Payout:* No winner, no cut for tied players, and all £${comp.prizePot} returned.`);
+      } else {
+        const w = comp.winnerRow;
+        lines.push(`🏆 *WINNER:* ${w.name} — *${w.combined} pts* (${formatSignedNumber(w.startExtra)} + ${w.points})`);
+        lines.push(`💷 *Prize Payout:* £${comp.prizePot} | *Winner Cut:* -${w.winnerCut} (Carry Fwd: ${formatSignedNumber(w.carryForward)})`);
+      }
+
+      lines.push('');
+      lines.push('*Black Book Ledger (Start | Score = Total | 18th | Carry Fwd):*');
+      comp.rows.forEach(r => {
+        if (r.played) {
+          const tag18 = r.scored18 ? 'Yes' : 'No';
+          const cutTag = r.winnerCut > 0 ? ` [-${r.winnerCut} cut]` : '';
+          lines.push(`• ${r.name}: ${formatSignedNumber(r.startExtra)} | ${r.points} = *${r.combined}* (${tag18})${cutTag} → *${formatSignedNumber(r.carryForward)}*`);
+        } else {
+          lines.push(`• ${r.name}: ${formatSignedNumber(r.startExtra)} | DNP → ${formatSignedNumber(r.carryForward)}`);
+        }
+      });
+
+      return lines.join('\n');
+    }
+
+    function copyWhatsAppSummary() {
+      const text = buildRoundSummaryText();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('Black Book page copied! Paste into WhatsApp');
+        }).catch(() => {
+          fallbackCopy(text);
+        });
+      } else {
+        fallbackCopy(text);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('Black Book page copied! Paste into WhatsApp');
+    }
+
+    // =========================================================================
+    // 7. UI RENDERING
+    // =========================================================================
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function openRosterJumpModal() {
+      const { computedMap } = computeAllSessions();
+      const activeSession = getActiveSession();
+      const comp = computedMap[activeSession.id];
+      const grid = document.getElementById('rosterJumpGrid');
+
+      grid.innerHTML = comp.rows.map((r, idx) => {
+        const isCurrent = idx === state.activePlayerIndex;
+        return `
+          <button onclick="selectPlayer(${idx}); closeModal('rosterJumpModal')"
+            class="p-2.5 rounded-xl border text-left transition flex items-center justify-between ${isCurrent ? 'border-[#1E4620] bg-emerald-50' : 'border-slate-200 bg-white hover:bg-slate-50'}">
+            <div class="min-w-0">
+              <div class="text-xs font-extrabold text-slate-900 truncate">${idx + 1}. ${escapeHtml(r.name)}</div>
+              <div class="text-[11px] text-slate-500">Start ${formatSignedNumber(r.startExtra)}${r.played ? ` → Fwd ${formatSignedNumber(r.carryForward)}` : ''}</div>
+            </div>
+            <span class="text-xs font-black px-2 py-0.5 rounded-md ${r.played ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'}">
+              ${r.played ? `${r.points}=${r.combined}` : '—'}
+            </span>
+          </button>
+        `;
+      }).join('');
+
+      document.getElementById('rosterJumpModal').classList.remove('hidden');
+    }
+
+    function openNewSessionModal() {
+      const ordered = getSortedSessions();
+      const nextDate = getNextWedOrSat(ordered[ordered.length - 1].date);
+      document.getElementById('suggestedNextDateLabel').textContent = formatFriendlyDate(nextDate);
+      document.getElementById('customSessionDate').value = nextDate;
+      document.getElementById('newSessionModal').classList.remove('hidden');
+    }
+
+    function openSyncModal() {
+      const currentCode = localStorage.getItem(GROUP_CODE_KEY) || '';
+      document.getElementById('groupCodeInput').value = currentCode;
+      document.getElementById('syncModal').classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toastBanner');
+      el.textContent = msg;
+      el.classList.remove('opacity-0');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        el.classList.add('opacity-0');
+      }, 2200);
+    }
+
+    function renderDeclarationBanner(comp, compact = false) {
+      if (comp.playersCount === 0) {
+        return `
+          <div class="bg-white border border-emerald-900/10 rounded-2xl p-3 shadow-xs flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">Live Standings</span>
+              <span class="text-xs font-bold text-slate-700">Enter scores to declare today's leader &amp; £2 pot</span>
+            </div>
+            <span class="text-xs font-black bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg">Pot: £0</span>
+          </div>
+        `;
+      }
+
+      if (comp.isTie) {
+        const names = comp.topScorers.map(t => escapeHtml(t.name)).join(' &amp; ');
+        return `
+          <div class="bg-amber-50 border-2 border-amber-400 rounded-2xl p-3 shadow-xs">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="text-xl">🤝</span>
+                <div class="min-w-0">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-amber-800 block">Leader Declaration: TIE (${comp.topScore} total)</span>
+                  <p class="text-xs font-extrabold text-slate-900 truncate">${names}</p>
+                </div>
+              </div>
+              <span class="shrink-0 text-[11px] font-black bg-amber-200/80 text-amber-950 px-2.5 py-1 rounded-lg">
+                Return £${comp.prizePot}
+              </span>
+            </div>
+            ${!compact ? `<p class="text-[11px] text-amber-900 mt-1.5 font-medium">Today's result is a TIE — no winner, no cut for tied players, and all £${comp.prizePot} is returned (no rollover).</p>` : ''}
+          </div>
+        `;
+      }
+
+      const w = comp.winnerRow;
+      return `
+        <div class="clubhouse-gradient text-white rounded-2xl p-3 shadow-md border border-amber-400/40">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-9 h-9 rounded-xl gold-gradient text-slate-950 flex items-center justify-center text-lg font-black shrink-0 shadow-xs">
+                🏆
+              </div>
+              <div class="min-w-0">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-300 block">
+                  ${compact ? 'Current Leader' : 'Outright Winner'} • ${w.combined} Total
+                </span>
+                <p class="text-sm font-black text-white truncate">${escapeHtml(w.name)} (${formatSignedNumber(w.startExtra)} + ${w.points})</p>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="text-[10px] uppercase font-bold text-emerald-200 block">Prize Pot</span>
+              <span class="text-base font-black text-amber-300">£${comp.prizePot}</span>
+            </div>
+          </div>
+          ${!compact ? `
+            <div class="mt-2 pt-2 border-t border-white/15 flex items-center justify-between text-[11px] text-emerald-100">
+              <span>Winner's Cut: <strong class="text-amber-300">-${w.winnerCut}</strong></span>
+              <span>New Carry Forward: <strong class="text-white">${formatSignedNumber(w.carryForward)}</strong></span>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderAll() {
+      const { orderedSessions, computedMap } = computeAllSessions();
+      const activeSession = getActiveSession();
+      const activeComp = computedMap[activeSession.id];
+
+      // 1. Header Subtext & Session Selector
+      document.getElementById('headerSubtext').textContent =
+        `${formatFriendlyDate(activeSession.date)} • ${activeComp.playersCount}/${state.players.length} Played`;
+
+      const sessionSelect = document.getElementById('sessionSelect');
+      sessionSelect.innerHTML = orderedSessions.map(s => {
+        const selected = s.id === activeSession.id ? 'selected' : '';
+        return `<option value="${s.id}" ${selected} class="text-slate-900">${formatFriendlyDate(s.date)}</option>`;
+      }).join('');
+      sessionSelect.onchange = e => changeActiveSession(e.target.value);
+
+      // 2. Entry Tab: Player Strip & Active Card
+      const strip = document.getElementById('playerPillStrip');
+      strip.innerHTML = activeComp.rows.map((r, idx) => {
+        const isCurrent = idx === state.activePlayerIndex;
+        let badgeStyle = 'bg-slate-100 text-slate-600 border-slate-200';
+        if (isCurrent) {
+          badgeStyle = 'clubhouse-gradient text-white border-[#1E4620] shadow-xs';
+        } else if (r.played) {
+          badgeStyle = 'bg-emerald-50 text-[#1E4620] border-emerald-300';
+        }
+        return `
+          <button id="pill_${idx}" onclick="selectPlayer(${idx})"
+            class="shrink-0 px-2.5 py-1 rounded-xl border text-xs font-extrabold transition flex items-center gap-1 ${badgeStyle}">
+            <span>${escapeHtml(r.name)}</span>
+            <span class="text-[10px] opacity-80">${r.played ? `(${r.points}=${r.combined})` : `[${formatSignedNumber(r.startExtra)}]`}</span>
+          </button>
+        `;
+      }).join('');
+
+      const activeRow = activeComp.rows[state.activePlayerIndex] || activeComp.rows[0];
+      document.getElementById('activePlayerIndexBadge').textContent = `#${state.activePlayerIndex + 1}`;
+      document.getElementById('activePlayerName').textContent = activeRow.name;
+      document.getElementById('activePlayerStartExtra').textContent = formatSignedNumber(activeRow.startExtra);
+
+      const displayVal = rawInputBuffer !== '' ? rawInputBuffer : (activeRow.played ? String(activeRow.points) : '—');
+      document.getElementById('scoreDisplayValue').textContent = displayVal;
+      document.getElementById('activePlayerCombinedPreview').textContent =
+        activeRow.played ? `${activeRow.combined}` : '—';
+      document.getElementById('activePlayerBreakdownPreview').textContent = activeRow.played
+        ? `${formatSignedNumber(activeRow.startExtra)} + ${activeRow.points} • Carry Fwd: ${formatSignedNumber(activeRow.carryForward)}`
+        : '';
+
+      // Style 18th Hole Yes / No Toggle Buttons
+      const btnYes = document.getElementById('btn18Yes');
+      const btnNo = document.getElementById('btn18No');
+      if (activeRow.played && activeRow.scored18) {
+        btnYes.className = 'py-2 px-3 rounded-xl font-black text-xs border-2 transition flex items-center justify-center gap-1.5 border-amber-500 bg-amber-100 text-amber-950 shadow-xs';
+        btnNo.className = 'py-2 px-3 rounded-xl font-black text-xs border-2 transition flex items-center justify-center gap-1.5 border-slate-200 bg-slate-50 text-slate-500';
+      } else if (activeRow.played && !activeRow.scored18) {
+        btnYes.className = 'py-2 px-3 rounded-xl font-black text-xs border-2 transition flex items-center justify-center gap-1.5 border-slate-200 bg-slate-50 text-slate-500';
+        btnNo.className = 'py-2 px-3 rounded-xl font-black text-xs border-2 transition flex items-center justify-center gap-1.5 border-emerald-600 bg-emerald-100 text-emerald-950 shadow-xs';
+      } else {
+        btnYes.className = 'py-2 px-3 rounded-xl font-black text-xs border-2 transition flex items-center justify-center gap-1.5 border-slate-200 bg-slate-50 text-slate-400';
+        btnNo.className = 'py-2 px-3 rounded-xl font-black text-xs border-2 transition flex items-center justify-center gap-1.5 border-slate-200 bg-slate-50 text-slate-400';
+      }
+
+      // Live Declaration Banner
+      document.getElementById('entryBannerContainer').innerHTML = renderDeclarationBanner(activeComp, true);
+      document.getElementById('resultsHeroCard').innerHTML = renderDeclarationBanner(activeComp, false);
+
+      // 3. Results Tab: KPIs & Full Black Book Ledger Table
+      document.getElementById('kpiPlayed').textContent = `${activeComp.playersCount}/${state.players.length}`;
+      document.getElementById('kpiPot').textContent = `£${activeComp.prizePot}`;
+      document.getElementById('kpiTopScore').textContent = activeComp.topScore !== null ? `${activeComp.topScore}` : '—';
+
+      // Keep the Black Book roster order (just like the handwritten book) with rank badge shown
+      const tbody = document.getElementById('resultsTableBody');
+      tbody.innerHTML = activeComp.rows.map((r, playerIdx) => {
+        if (!r.played) {
+          return `
+            <tr onclick="selectPlayer(${playerIdx}); switchTab('entry')" class="text-slate-400 hover:bg-slate-50 cursor-pointer">
+              <td class="py-2.5 pl-3 pr-1 font-bold">—</td>
+              <td class="py-2.5 px-1.5 font-semibold text-slate-600">${escapeHtml(r.name)}</td>
+              <td class="py-2.5 px-1 text-center font-bold text-slate-600">${formatSignedNumber(r.startExtra)}</td>
+              <td class="py-2.5 px-1 text-center text-[11px]" colspan="4">—</td>
+              <td class="py-2.5 pl-1 pr-3 text-right font-extrabold text-slate-700">${formatSignedNumber(r.carryForward)}</td>
+            </tr>
+          `;
+        }
+
+        let rowBg = 'hover:bg-slate-50';
+        let posBadge = `<span class="font-extrabold text-slate-600">${r.rank}</span>`;
+        if (r.isWinner) {
+          rowBg = 'bg-amber-50/70 hover:bg-amber-50';
+          posBadge = `<span class="inline-block px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 font-black text-[10px]">1st 🏆</span>`;
+        } else if (r.isTiedFirst) {
+          rowBg = 'bg-amber-50/50 hover:bg-amber-50';
+          posBadge = `<span class="inline-block px-1.5 py-0.5 rounded bg-amber-200 text-amber-950 font-black text-[10px]">T1 🤝</span>`;
+        }
+
+        return `
+          <tr onclick="selectPlayer(${playerIdx}); switchTab('entry')" class="${rowBg} cursor-pointer transition">
+            <td class="py-2.5 pl-3 pr-1">${posBadge}</td>
+            <td class="py-2.5 px-1.5 font-extrabold text-slate-900">
+              ${escapeHtml(r.name)}
+              ${r.isWinner ? `<span class="block text-[10px] font-bold text-emerald-700">Wins £${activeComp.prizePot}</span>` : ''}
+              ${r.isTiedFirst ? `<span class="block text-[10px] font-bold text-amber-700">Tied 1st (No Cut)</span>` : ''}
+            </td>
+            <td class="py-2.5 px-1 text-center font-bold text-slate-600">${formatSignedNumber(r.startExtra)}</td>
+            <td class="py-2.5 px-1 text-center font-bold text-slate-800">${r.points}</td>
+            <td class="py-2.5 px-1 text-center font-black text-sm text-[#1E4620]">${r.combined}</td>
+            <td class="py-2.5 px-1 text-center font-bold ${r.scored18 ? 'text-amber-700' : 'text-slate-400'}">
+              ${r.scored18 ? 'Yes' : 'No'}
+            </td>
+            <td class="py-2.5 px-1 text-center font-bold ${r.winnerCut > 0 ? 'text-rose-600' : 'text-slate-300'}">
+              ${r.winnerCut > 0 ? `-${r.winnerCut}` : '0'}
+            </td>
+            <td class="py-2.5 pl-1 pr-3 text-right font-black text-slate-900">${formatSignedNumber(r.carryForward)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      // 4. Season History List
+      const seasonList = document.getElementById('seasonHistoryList');
+      seasonList.innerHTML = [...orderedSessions].reverse().map(s => {
+        const comp = computedMap[s.id];
+        const isCurrent = s.id === activeSession.id;
+        let summary = 'No scores yet';
+        if (comp.playersCount > 0) {
+          summary = comp.isTie
+            ? `Tie (${comp.topScore} total) • Pot £${comp.prizePot} returned`
+            : `Winner: ${comp.winnerRow.name} (${comp.topScore} total) • £${comp.prizePot}`;
+        }
+        return `
+          <div class="flex items-center justify-between gap-2 p-2.5 rounded-xl border ${isCurrent ? 'bg-emerald-50 border-emerald-300' : 'bg-slate-50 border-slate-200'}">
+            <button type="button" onclick="changeActiveSession('${s.id}'); switchTab('results')" class="text-left min-w-0 flex-1">
+              <div class="text-xs font-extrabold text-slate-900">${formatFriendlyDate(s.date)}</div>
+              <div class="text-[11px] text-slate-600 truncate">${comp.playersCount}/${state.players.length} played • ${summary}</div>
+            </button>
+            ${orderedSessions.length > 1 ? `
+              <button type="button" onclick="deleteSession('${s.id}')"
+                class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-extrabold text-[11px] border border-rose-200 shrink-0">
+                Delete
+              </button>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Boot App
+    syncInputBufferFromCurrentPlayer();
+    switchTab(state.activeTab || 'entry');
+  </script>
+
+  <!-- ======================================================================= -->
+  <!-- FIREBASE REAL-TIME SYNC MODULE (SEPARATE COLLECTION FOR EXTRAS APP)     -->
+  <!-- ======================================================================= -->
+  <script type="module">
+    const MY_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyB3jICPqw9As2M1VWzgWtv00XTW-35Pul8",
+      authDomain: "wgc-black-book-boys.firebaseapp.com",
+      projectId: "wgc-black-book-boys",
+      storageBucket: "wgc-black-book-boys.firebasestorage.app",
+      messagingSenderId: "949327320115",
+      appId: "1:949327320115:web:ba565847d6a8295c787f46"
+    };
+
+    const firebaseConfig = (typeof __firebase_config !== 'undefined')
+      ? JSON.parse(__firebase_config)
+      : (MY_FIREBASE_CONFIG.apiKey ? MY_FIREBASE_CONFIG : null);
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'wgc-black-book-boys';
+
+    let db = null;
+    let authUser = null;
+    let unsubscribeSnapshot = null;
+    let isApplyingRemoteUpdate = false;
+    let docFn = null;
+    let setDocFn = null;
+    let onSnapshotFn = null;
+    let getDocFn = null;
+
+    function updateSyncUI(statusText, dotColorClass, detailText) {
+      const dot = document.getElementById('syncStatusDot');
+      const label = document.getElementById('syncStatusLabel');
+      const seasonSummary = document.getElementById('seasonSyncSummary');
+      if (dot) dot.className = `w-2 h-2 rounded-full ${dotColorClass}`;
+      if (label) label.textContent = statusText;
+      if (seasonSummary && detailText) seasonSummary.textContent = detailText;
+    }
+
+    async function initCloudSync() {
+      if (!firebaseConfig) {
+        updateSyncUI('Local', 'bg-amber-300', 'Saved locally on this phone.');
+        return;
+      }
+
+      try {
+        const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
+        const { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
+        const { getFirestore, doc, setDoc, getDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js');
+
+        docFn = doc;
+        setDocFn = setDoc;
+        getDocFn = getDoc;
+        onSnapshotFn = onSnapshot;
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        db = getFirestore(app);
+
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+
+        onAuthStateChanged(auth, user => {
+          authUser = user;
+          const savedCode = localStorage.getItem(GROUP_CODE_KEY);
+          if (user && savedCode) {
+            subscribeToGroup(savedCode);
+          } else {
+            updateSyncUI('Sync', 'bg-amber-300', 'Tap "Configure Sync" and enter a Group Code to sync across phones.');
+          }
+        });
+      } catch (err) {
+        console.warn('Cloud sync unavailable, running in local mode:', err);
+        updateSyncUI('Local', 'bg-amber-300', 'Saved locally on this phone.');
+      }
+    }
+
+    async function subscribeToGroup(rawCode) {
+      const cleanCode = rawCode.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+      if (!cleanCode || !db || !authUser) return;
+
+      if (unsubscribeSnapshot) {
+        unsubscribeSnapshot();
+        unsubscribeSnapshot = null;
+      }
+
+      localStorage.setItem(GROUP_CODE_KEY, cleanCode);
+      const groupDocRef = docFn(db, 'artifacts', appId, 'public', 'data', 'society_extras_groups', cleanCode);
+
+      try {
+        const snap = await getDocFn(groupDocRef);
+        if (snap.exists() && snap.data() && snap.data().payload) {
+          const remoteState = JSON.parse(snap.data().payload);
+          if (remoteState && Array.isArray(remoteState.players) && Array.isArray(remoteState.sessions)) {
+            isApplyingRemoteUpdate = true;
+            state = remoteState;
+            saveState(true);
+            renderAll();
+            isApplyingRemoteUpdate = false;
+          }
+        } else {
+          await setDocFn(groupDocRef, {
+            payload: JSON.stringify(state),
+            updatedAt: Date.now()
+          });
+        }
+
+        unsubscribeSnapshot = onSnapshotFn(groupDocRef, docSnap => {
+          if (!docSnap.exists() || !docSnap.data() || !docSnap.data().payload) return;
+          const incoming = JSON.parse(docSnap.data().payload);
+          if (!incoming || !Array.isArray(incoming.players) || !Array.isArray(incoming.sessions)) return;
+          if ((incoming.updatedAt || 0) > (state.updatedAt || 0)) {
+            isApplyingRemoteUpdate = true;
+            const keepTab = state.activeTab;
+            const keepPlayerIdx = state.activePlayerIndex;
+            state = incoming;
+            state.activeTab = keepTab;
+            state.activePlayerIndex = Math.min(keepPlayerIdx, state.players.length - 1);
+            saveState(true);
+            renderAll();
+            isApplyingRemoteUpdate = false;
+          }
+        });
+
+        updateSyncUI(cleanCode, 'bg-emerald-400 animate-pulse', `Connected to Group Code "${cleanCode}" — syncing live across phones.`);
+      } catch (err) {
+        console.warn('Could not subscribe to group:', err);
+        updateSyncUI('Offline', 'bg-rose-400', 'Could not reach cloud sync — saving locally.');
+      }
+    }
+
+    window.pushStateToCloud = async function(latestState) {
+      if (isApplyingRemoteUpdate || !db || !authUser || !setDocFn) return;
+      const cleanCode = localStorage.getItem(GROUP_CODE_KEY);
+      if (!cleanCode) return;
+      try {
+        const groupDocRef = docFn(db, 'artifacts', appId, 'public', 'data', 'society_extras_groups', cleanCode);
+        await setDocFn(groupDocRef, {
+          payload: JSON.stringify(latestState),
+          updatedAt: latestState.updatedAt || Date.now()
+        });
+      } catch (err) {
+        console.warn('Background cloud push queued locally:', err);
+      }
+    };
+
+    window.connectGroupSync = function() {
+      const code = document.getElementById('groupCodeInput').value.trim();
+      if (!code) {
+        showToast('Please enter a Group Code');
+        return;
+      }
+      if (!firebaseConfig) {
+        localStorage.setItem(GROUP_CODE_KEY, code.toUpperCase());
+        closeModal('syncModal');
+        showToast('Group Code saved!');
+        return;
+      }
+      subscribeToGroup(code);
+      closeModal('syncModal');
+      showToast(`Connected to Group: ${code.toUpperCase()}`);
+    };
+
+    window.disconnectGroupSync = function() {
+      if (unsubscribeSnapshot) {
+        unsubscribeSnapshot();
+        unsubscribeSnapshot = null;
+      }
+      localStorage.removeItem(GROUP_CODE_KEY);
+      updateSyncUI('Local', 'bg-amber-300', 'Disconnected from cloud sync — saving locally on this phone.');
+      closeModal('syncModal');
+      showToast('Switched to Offline / Local mode');
+    };
+
+    initCloudSync();
+  </script>
+</body>
+</html>
